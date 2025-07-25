@@ -18,57 +18,50 @@ module.exports = async function handler(req, res) {
       {
         id: 1,
         name: 'Account 1',
-        email: '2003aman01.sharma@gmail.com',
-        password: 'phszxjngntaqqncj',
+        email: 'aprajita@vidzy.in',
+        password: 'kdjabrjmwzoatheb',
         active: true
       },
       {
         id: 2,
         name: 'Account 2',
-        email: 'oravi8937@gmail.com',
-        password: 'vvqxkbraclqzclgu',
+        email: 'aman@vidzy.in',
+        password: 'hpooftkcjrynuapd',
         active: false
       },
       {
         id: 3,
         name: 'Account 3',
-        email: 'kavitathappar@gmail.com',
-        password: 'smgqmkpskbvhgzpb',
+        email: 'khushigupta@vidzy.in',
+        password: 'gjtwjnklwevclovw',
         active: false
       },
       {
         id: 4,
         name: 'Account 4',
-        email: 'hitesh.singh08876@gmail.com',
-        password: 'fsblmovdsuawhedw',
+        email: 'vasu@vidzy.in',
+        password: 'zgtmovcxrebpjnaf',
         active: false
       },
       {
         id: 5,
         name: 'Account 5',
-        email: 'virajgupta211@gmail.com',
-        password: 'xqeocvxkpvasefcy',
+        email: 'arshad@vidzy.in',
+        password: 'bxngwhiqhqmtzbrh',
         active: false
       },
       {
         id: 6,
         name: 'Account 6',
-        email: 'mirakhan9880@gmail.com',
-        password: 'cnkovpqzebmcirja',
+        email: 'mayank@vidzy.in',
+        password: 'nzqbgunjxqnbnsqk',
         active: false
       },
       {
         id: 7,
         name: 'Account 7',
-        email: 'amanfrommywall@gmail.com',
-        password: 'yiboyxsjzjplptbb',
-        active: false
-      },
-      {
-        id: 8,
-        name: 'Account 8',
-        email: 'fardeenkhandigital0@gmail.com',
-        password: 'iciborahoifdhuzf',
+        email: 'vibhanshu@vidzy.in',
+        password: 'bwmigdrkpumvbcrp',
         active: false
       }
     ];
