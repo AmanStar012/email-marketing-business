@@ -16,8 +16,8 @@ module.exports = async function handler(req, res) {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: '2003aman01.sharma@gmail.com',
-        pass: 'phszxjngntaqqncj'
+        user: 'aman@vidzy.in',
+        pass: 'hpooftkcjrynuapd'
       }
     });
 
@@ -25,7 +25,7 @@ module.exports = async function handler(req, res) {
     const htmlContent = convertTextToHTML(content);
 
     const result = await transporter.sendMail({
-      from: '2003aman01.sharma@gmail.com',
+      from: 'aman@vidzy.in',
       to: to,
       subject: subject,
       html: htmlContent  // Use HTML instead of plain text
