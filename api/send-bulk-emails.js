@@ -63,7 +63,183 @@ module.exports = async function handler(req, res) {
         email: 'vibhanshu@vidzy.in',
         password: 'bwmigdrkpumvbcrp',
         active: false
-      }
+      },
+    {
+    id: 8, 
+    name: 'Account 8',
+    email: 'diya@mywallbrands.shop',
+    password: 'vzjpebxiyjrxaaia', 
+    active: false
+    },
+    {
+    id: 9, 
+    name: 'Account 9',
+    email: 'ananya@mywallsocial.shop',
+    password: 'jxduvxqlhihasgtk', 
+    active: false
+    },
+    {
+    id: 10, 
+    name: 'Account 10',
+    email: 'riya@mywallsocial.shop',
+    password: 'viyfmswqfalqpiyo', 
+    active: false
+    },
+    {
+    id: 11, 
+    name: 'Account 11',
+    email: 'ishita@mywallsocial.shop',
+    password: 'ihgmfczeyubdnjsf', 
+    active: false
+    },
+    {
+    id: 12, 
+    name: 'Account 12',
+    email: 'saanvi@mywallsocial.shop',
+    password: 'xuvexdnfvksxpqnf', 
+    active: false
+    },
+    {
+    id: 13, 
+    name: 'Account 13',
+    email: 'tanvi@mywallsocial.shop',
+    password: 'bfxjpwzikiudadbt', 
+    active: false
+    },
+    {
+    id: 14, 
+    name: 'Account 14',
+    email: 'kavya@mywallsocial.shop',
+    password: 'ikhdyffpmyrxgbbw', 
+    active: false
+    },
+    {
+    id: 15, 
+    name: 'Account 15',
+    email: 'myra@mywallsocial.shop',
+    password: 'gfjkmcqajeluickp', 
+    active: false
+    },
+    {
+    id: 16, 
+    name: 'Account 16',
+    email: 'ira@mywallsocial.shop',
+    password: 'srqpofgwocdmblis', 
+    active: false
+    },
+    {
+    id: 17, 
+    name: 'Account 17',
+    email: 'charvi@mywallsocial.shop',
+    password: 'wnexoygjyatfwzqm', 
+    active: false
+    },
+    {
+    id: 18, 
+    name: 'Account 18',
+    email: 'diya@mywallbrands.shop',
+    password: 'meewibndkcrjsrfw', 
+    active: false
+    },
+    {
+    id: 19, 
+    name: 'Account 19',
+    email: 'ananya@mywallbrands.shop',
+    password: 'jtvkbpvmqbrqhrlq', 
+    active: false
+    },
+    {
+    id: 20, 
+    name: 'Account 20',
+    email: 'riya@mywallbrands.shop',
+    password: 'axomyzxcfkigcgmt', 
+    active: false
+    },
+    {
+    id: 21, 
+    name: 'Account 21',
+    email: 'ishita@mywallbrands.shop',
+    password: 'tmvqeyoibqhvprpe', 
+    active: false
+    },
+    {
+    id: 22, 
+    name: 'Account 22',
+    email: 'saanvi@mywallbrands.shop',
+    password: 'kqfkpcwjsylfyuqo', 
+    active: false
+    },
+    {
+    id: 23, 
+    name: 'Account 23',
+    email: 'tanvi@mywallbrands.shop',
+    password: 'kstdneatqihewqqn', 
+    active: false
+    },
+    {
+    id: 24, 
+    name: 'Account 24',
+    email: 'kavya@mywallbrands.shop',
+    password: 'rkuaeccpifittxxz', 
+    active: false
+    },
+    {
+    id: 25, 
+    name: 'Account 25',
+    email: 'myra@mywallbrands.shop',
+    password: 'zxvuvygkyxwuxffn', 
+    active: false
+    },
+    {
+    id: 26, 
+    name: 'Account 26',
+    email: 'ira@mywallbrands.shop',
+    password: 'cjdnliijkchmgrtv', 
+    active: false
+    },
+    {
+    id: 27, 
+    name: 'Account 27',
+    email: 'charvi@mywallbrands.shop',
+    password: 'ngceozdoxmaymmmy', 
+    active: false
+    },
+    {
+    id: 28, 
+    name: 'Account 28',
+    email: 'diya@mywallstudio.shop',
+    password: 'vpucgukdypymwzqx', 
+    active: false
+    },
+    {
+    id: 29, 
+    name: 'Account 29',
+    email: 'ananya@mywallstudio.shop',
+    password: 'oglhiqyramhvzahn', 
+    active: false
+    },
+    {
+    id: 30, 
+    name: 'Account 30',
+    email: 'riya@mywallstudio.shop',
+    password: 'ljopgovgknpwldiv', 
+    active: false
+    },
+    {
+    id: 31, 
+    name: 'Account 31',
+    email: 'ira@mywallstudio.shop',
+    password: 'rxjybwjdbwwfmlgi', 
+    active: false
+    },
+    {
+    id: 32, 
+    name: 'Account 32',
+    email: 'charvi@mywallstudio.shop',
+    password: 'nrhwoiuiiekfflye', 
+    active: false
+    }
+
     ];
 
     // Select account based on frontend selection or use first active
@@ -205,3 +381,4 @@ function convertTextToHTML(text) {
     .replace(/^/, '<div style="white-space: pre-wrap; font-family: Arial, sans-serif; line-height: 1.6; color: #333;">')
     .replace(/$/, '</div>');
 }
+
