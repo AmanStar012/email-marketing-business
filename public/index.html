@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Marketing Business - Multiple account System (Rich Editor)</title>
+    <title>Email Marketing Business - Multiple account System</title>
     <style>
         * {
             margin: 0;
@@ -549,25 +549,29 @@
             margin-top: 25px;
         }
 
-        /* --- Rich editor --- */
-        .editor-toolbar{
-          display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; align-items:center;
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .selector-buttons {
+                justify-content: center;
+            }
         }
-        .editor-btn{
-          border:1px solid #e9ecef; background:#fff; padding:6px 10px; border-radius:8px;
-          cursor:pointer; font-size:13px; font-weight:600;
-        }
-        .editor-btn:hover{ background:#f4f6f8; }
-        .heading-select{
-          border:1px solid #e9ecef; background:#fff; padding:6px 10px; border-radius:8px;
-          font-size:13px; font-weight:600;
-        }
-        .rich-editor{
-          width:100%; min-height:160px; padding:12px 16px; border:2px solid #e9ecef; border-radius:10px;
-          font-size:14px; line-height:1.6; background:#fff; outline:none;
-        }
-        .rich-editor:focus{ border-color:#3498db; box-shadow:0 0 0 3px rgba(52,152,219,.1); }
-        .rich-editor a{ color:#1f6feb; text-decoration:underline; }
     </style>
 </head>
 <body>
@@ -639,31 +643,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Email Content</label>
-
-                        <!-- Toolbar -->
-                        <div class="editor-toolbar">
-                            <button type="button" class="editor-btn" onclick="fmt('bold')"><b>B</b></button>
-                            <button type="button" class="editor-btn" onclick="fmt('italic')"><i>I</i></button>
-                            <button type="button" class="editor-btn" onclick="fmt('underline')"><u>U</u></button>
-                            <button type="button" class="editor-btn" onclick="fmt('insertUnorderedList')">• Bullets</button>
-                            <button type="button" class="editor-btn" onclick="fmt('insertOrderedList')">1. Numbers</button>
-                            <select class="heading-select" onchange="applyHeading(this.value)">
-                                <option value="P">Paragraph</option>
-                                <option value="H2">Heading 2</option>
-                                <option value="H3">Heading 3</option>
-                            </select>
-                            <button type="button" class="editor-btn" onclick="makeLink()">🔗 Link</button>
-                            <button type="button" class="editor-btn" onclick="unlink()">✖️ Unlink</button>
-                            <button type="button" class="editor-btn" onclick="clearFormat()">🧹 Clear</button>
-                        </div>
-
-                        <!-- ContentEditable editor -->
-                        <div id="emailEditor" class="rich-editor" contenteditable="true">
-                          Dear {{firstName}},<br><br>
-                          Hope you're doing well! I wanted to reach out about...<br><br>
-                          Best regards,<br>
-                          Your Name
-                        </div>
+                        <textarea class="form-control form-control-textarea" id="emailContent" placeholder="Dear {{firstName}},&#10;&#10;Hope you're doing well! I wanted to reach out about...&#10;&#10;Best regards,&#10;Your Name"></textarea>
                     </div>
                 </div>
             </div>
@@ -911,7 +891,7 @@
 
         function parseCSV(csvData) {
             try {
-                const lines = csvData.split('\\n').filter(line => line.trim() !== '');
+                const lines = csvData.split('\n').filter(line => line.trim() !== '');
                 
                 if (lines.length < 2) {
                     log('CSV file must have at least a header row and one data row', 'error');
@@ -1074,71 +1054,15 @@
             });
         }
 
-        // Insert merge field into rich editor at caret
-        function insertMergeField(field){
-            insertAtCaret(field);
-        }
-
-        // --- Rich editor helpers ---
-        function fmt(cmd){ document.execCommand(cmd, false, null); }
-        function applyHeading(tag){
-          if(tag === 'P'){ document.execCommand('formatBlock', false, 'P'); }
-          else if(tag === 'H2'){ document.execCommand('formatBlock', false, 'H2'); }
-          else if(tag === 'H3'){ document.execCommand('formatBlock', false, 'H3'); }
-          document.getElementById('emailEditor').focus();
-        }
-
-        function makeLink(){
-          const url = prompt('Enter URL (https://...)');
-          if(!url) return;
-          const sel = window.getSelection();
-          if(sel && sel.isCollapsed){
-            document.execCommand('insertText', false, url);
-            selectLastInserted(url);
-          }
-          document.execCommand('createLink', false, url);
-        }
-        function unlink(){ document.execCommand('unlink', false, null); }
-        function clearFormat(){
-          document.execCommand('removeFormat', false, null);
-          document.execCommand('unlink', false, null);
-        }
-        function selectLastInserted(text){
-          const editor = document.getElementById('emailEditor');
-          const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null, false);
-          let lastNode = null, found = null;
-          while((lastNode = walker.nextNode())){
-            const idx = lastNode.nodeValue.lastIndexOf(text);
-            if(idx !== -1){ found = {node:lastNode, idx}; }
-          }
-          if(found){
-            const r = document.createRange();
-            r.setStart(found.node, found.idx);
-            r.setEnd(found.node, found.idx + text.length);
-            const sel = window.getSelection();
-            sel.removeAllRanges(); sel.addRange(r);
-          }
-        }
-        function getEditorHTML(){ return document.getElementById('emailEditor').innerHTML; }
-        function setEditorHTML(html){ document.getElementById('emailEditor').innerHTML = html || ''; }
-        function insertAtCaret(html){
-          const editor = document.getElementById('emailEditor');
-          editor.focus();
-          const sel = window.getSelection();
-          if(!sel || sel.rangeCount === 0){ return; }
-          const range = sel.getRangeAt(0);
-          range.deleteContents();
-          const temp = document.createElement('span');
-          temp.innerHTML = html;
-          const frag = document.createDocumentFragment();
-          let node, lastNode;
-          while((node = temp.firstChild)){ lastNode = frag.appendChild(node); }
-          range.insertNode(frag);
-          if(lastNode){
-            range.setStartAfter(lastNode);
-            range.collapse(true);
-            sel.removeAllRanges(); sel.addRange(range);
-          }
+        function insertMergeField(field) {
+            const textarea = document.getElementById('emailContent');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            
+            textarea.value = text.substring(0, start) + field + text.substring(end);
+            textarea.setSelectionRange(start + field.length, start + field.length);
+            textarea.focus();
         }
 
         function loadDemoAccounts() {
@@ -1206,8 +1130,306 @@
                     maxSends: 40,
                     active: false   
                 },
-                { id: 8, email: 'diya@mywallbrands.shop', provider: 'Gmail Account 8', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 9, email: 'ananya@mywallsocial.shop', provider: 'Gmail Account 9', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 10, email: 'riya@mywallsocial.shop', provider: 'Gmail Account 10', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 11, email: 'ishita@mywallsocial.shop', provider: 'Gmail Account 11', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 12, email: 'saanvi@mywallsocial.shop', provider: 'Gmail Account 12', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 13, email: 'tanvi@mywallsocial.shop', provider: 'Gmail Account 13', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 14, email: 'kavya@mywallsocial.shop', provider: 'Gmail Account 14', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 15, email: 'myra@mywallsocial.shop', provider: 'Gmail Account 15', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 16, email: 'ira@mywallsocial.shop', provider: 'Gmail Account 16', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 17, email: 'charvi@mywallsocial.shop', provider: 'Gmail Account 17', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 18, email: 'diya@mywallbrands.shop', provider: 'Gmail Account 18', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 19, email: 'ananya@mywallbrands.shop', provider: 'Gmail Account 19', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 20, email: 'riya@mywallbrands.shop', provider: 'Gmail Account 20', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 21, email: 'ishita@mywallbrands.shop', provider: 'Gmail Account 21', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 22, email: 'saanvi@mywallbrands.shop', provider: 'Gmail Account 22', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 23, email: 'tanvi@mywallbrands.shop', provider: 'Gmail Account 23', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 24, email: 'kavya@mywallbrands.shop', provider: 'Gmail Account 24', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 25, email: 'myra@mywallbrands.shop', provider: 'Gmail Account 25', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 26, email: 'ira@mywallbrands.shop', provider: 'Gmail Account 26', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 27, email: 'charvi@mywallbrands.shop', provider: 'Gmail Account 27', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 28, email: 'diya@mywallstudio.shop', provider: 'Gmail Account 28', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 29, email: 'ananya@mywallstudio.shop', provider: 'Gmail Account 29', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 30, email: 'riya@mywallstudio.shop', provider: 'Gmail Account 30', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 31, email: 'ira@mywallstudio.shop', provider: 'Gmail Account 31', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 32, email: 'charvi@mywallstudio.shop', provider: 'Gmail Account 32', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 33, email: 'anvi@grynowinfluence.shop', provider: 'Gmail Account 33', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 34, email: 'charvi@grynowinfluence.shop', provider: 'Gmail Account 34', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 35, email: 'ira@grynowinfluence.shop', provider: 'Gmail Account 35', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 36, email: 'myra@grynowinfluence.shop', provider: 'Gmail Account 36', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 37, email: 'kavya@grynowinfluence.shop', provider: 'Gmail Account 37', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 38, email: 'tanvi@grynowinfluence.shop', provider: 'Gmail Account 38', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 39, email: 'riya@grynowinfluence.shop', provider: 'Gmail Account 39', connected: true, sentCount: 0, maxSends: 40, active: false },
-                { id: 40, email: 'saanvi@grynowinfluence.shop', provider: 'Gmail Account 40', connected: true, sentCount: 0, maxSends: 40, active: false }
+    {
+    id: 8,
+    email: 'diya@mywallbrands.shop',
+    provider: 'Gmail Account 8',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 9,
+    email: 'ananya@mywallsocial.shop',
+    provider: 'Gmail Account 9',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 10,
+    email: 'riya@mywallsocial.shop',
+    provider: 'Gmail Account 10',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 11,
+    email: 'ishita@mywallsocial.shop',
+    provider: 'Gmail Account 11',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 12,
+    email: 'saanvi@mywallsocial.shop',
+    provider: 'Gmail Account 12',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 13,
+    email: 'tanvi@mywallsocial.shop',
+    provider: 'Gmail Account 13',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 14,
+    email: 'kavya@mywallsocial.shop',
+    provider: 'Gmail Account 14',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 15,
+    email: 'myra@mywallsocial.shop',
+    provider: 'Gmail Account 15',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 16,
+    email: 'ira@mywallsocial.shop',
+    provider: 'Gmail Account 16',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 17,
+    email: 'charvi@mywallsocial.shop',
+    provider: 'Gmail Account 17',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 18,
+    email: 'diya@mywallbrands.shop',
+    provider: 'Gmail Account 18',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 19,
+    email: 'ananya@mywallbrands.shop',
+    provider: 'Gmail Account 19',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 20,
+    email: 'riya@mywallbrands.shop',
+    provider: 'Gmail Account 20',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 21,
+    email: 'ishita@mywallbrands.shop',
+    provider: 'Gmail Account 21',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 22,
+    email: 'saanvi@mywallbrands.shop',
+    provider: 'Gmail Account 22',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 23,
+    email: 'tanvi@mywallbrands.shop',
+    provider: 'Gmail Account 23',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 24,
+    email: 'kavya@mywallbrands.shop',
+    provider: 'Gmail Account 24',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 25,
+    email: 'myra@mywallbrands.shop',
+    provider: 'Gmail Account 25',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 26,
+    email: 'ira@mywallbrands.shop',
+    provider: 'Gmail Account 26',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 27,
+    email: 'charvi@mywallbrands.shop',
+    provider: 'Gmail Account 27',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 28,
+    email: 'diya@mywallstudio.shop',
+    provider: 'Gmail Account 28',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 29,
+    email: 'ananya@mywallstudio.shop',
+    provider: 'Gmail Account 29',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 30,
+    email: 'riya@mywallstudio.shop',
+    provider: 'Gmail Account 30',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 31,
+    email: 'ira@mywallstudio.shop',
+    provider: 'Gmail Account 31',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+    id: 32,
+    email: 'charvi@mywallstudio.shop',
+    provider: 'Gmail Account 32',
+    connected: true,
+    sentCount: 0,
+    maxSends: 40,
+    active: false
+    },
+    {
+  id: 33,
+  email: 'anvi@grynowinfluence.shop',
+  provider: 'Gmail Account 33',
+  connected: true,
+  sentCount: 0,
+  maxSends: 40,
+  active: false
+},
+{
+  id: 34,
+  email: 'charvi@grynowinfluence.shop',
+  provider: 'Gmail Account 34',
+  connected: true,
+  sentCount: 0,
+  maxSends: 40,
+  active: false
+},
+{
+  id: 35,
+  email: 'ira@grynowinfluence.shop',
+  provider: 'Gmail Account 35',
+  connected: true,
+  sentCount: 0,
+  maxSends: 40,
+  active: false
+},
+{
+  id: 36,
+  email: 'myra@grynowinfluence.shop',
+  provider: 'Gmail Account 36',
+  connected: true,
+  sentCount: 0,
+  maxSends: 40,
+  active: false
+},
+{
+  id: 37,
+  email: 'kavya@grynowinfluence.shop',
+  provider: 'Gmail Account 37',
+  connected: true,
+  sentCount: 0,
+  maxSends: 40,
+  active: false
+},
+{
+  id: 38,
+  email: 'tanvi@grynowinfluence.shop',
+  provider: 'Gmail Account 38',
+  connected: true,
+  sentCount: 0,
+  maxSends: 40,
+  active: false
+},
+{
+  id: 39,
+  email: 'riya@grynowinfluence.shop',
+  provider: 'Gmail Account 39',
+  connected: true,
+  sentCount: 0,
+  maxSends: 40,
+  active: false
+},
+{
+  id: 40,
+  email: 'saanvi@grynowinfluence.shop',
+  provider: 'Gmail Account 40',
+  connected: true,
+  sentCount: 0,
+  maxSends: 40,
+  active: false
+}
+
+     
+                  
             ];
             renderEmailAccounts();
         }
@@ -1309,7 +1531,7 @@
             
             const campaignName = document.getElementById('campaignName').value || 'Untitled Campaign';
             const subject = document.getElementById('subjectLine').value;
-            const content = getEditorHTML();
+            const content = document.getElementById('emailContent').value;
             
             if (!subject || !content) {
                 log('Please fill in subject and content', 'error');
@@ -1342,6 +1564,7 @@
                     log(`🎯 Primary account: ${result.results.usedAccount}`, 'info');
                     log(`📊 Results: ${result.results.sent} sent, ${result.results.failed} failed`, 'info');
                     
+                    // Show account switches
                     if (result.results.accountSwitches && result.results.accountSwitches.length > 0) {
                         log(`🔄 Account switches: ${result.results.accountSwitches.length}`, 'info');
                         result.results.accountSwitches.forEach((switchInfo, index) => {
@@ -1349,14 +1572,17 @@
                         });
                     }
                     
+                    // Update stats
                     state.stats.totalSent = result.results.sent;
                     state.stats.failed = result.results.failed;
                     state.stats.successRate = result.results.successRate;
                     state.stats.inQueue = 0;
                     updateStats();
                     
+                    // Update progress bar
                     document.getElementById('progressFill').style.width = '100%';
                     
+                    // Show errors if any
                     if (result.results.errors.length > 0) {
                         log(`❌ Failed emails: ${result.results.errors.length}`, 'error');
                         result.results.errors.slice(0, 5).forEach(error => {
@@ -1386,7 +1612,7 @@
             }
             
             const subject = document.getElementById('subjectLine').value || 'Test Email';
-            const content = getEditorHTML() || 'This is a test email from Email Marketing Pro.';
+            const content = document.getElementById('emailContent').value || 'This is a test email from Email Marketing Pro.';
             
             try {
                 log(`📧 Sending test email to ${testEmail}...`, 'info');
@@ -1411,7 +1637,7 @@
 
         function previewEmail() {
             const subject = document.getElementById('subjectLine').value;
-            const contentHTML = getEditorHTML();
+            const content = document.getElementById('emailContent').value;
             
             if (state.contacts.length === 0) {
                 log('Please upload contacts to preview email', 'error');
@@ -1420,19 +1646,19 @@
             
             const sampleContact = state.contacts[0];
             const previewSubject = personalizeTemplate(subject, sampleContact);
-            const previewContent = personalizeTemplate(contentHTML, sampleContact);
+            const previewContent = personalizeTemplate(content, sampleContact);
             
-            const previewWindow = window.open('', '_blank', 'width=700,height=600');
+            const previewWindow = window.open('', '_blank', 'width=700,height=500');
             previewWindow.document.write(`
                 <!DOCTYPE html>
                 <html>
                 <head>
                     <title>Email Preview</title>
                     <style>
-                        body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; background:#f8f9fa }
-                        .preview-header { background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border:1px solid #ddd; }
+                        body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; }
+                        .preview-header { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
                         .preview-subject { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
-                        .preview-content { background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+                        .preview-content { background: white; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
                     </style>
                 </head>
                 <body>
@@ -1440,7 +1666,9 @@
                         <div class="preview-subject">Subject: ${previewSubject}</div>
                         <div>To: ${getContactEmail(sampleContact)}</div>
                     </div>
-                    <div class="preview-content">${previewContent}</div>
+                    <div class="preview-content">
+                        <div style="white-space: pre-wrap;">${previewContent}</div>
+                    </div>
                 </body>
                 </html>
             `);
@@ -1453,7 +1681,7 @@
             const template = {
                 name: templateName,
                 subject: document.getElementById('subjectLine').value,
-                content: getEditorHTML(),
+                content: document.getElementById('emailContent').value,
                 timestamp: new Date().toISOString()
             };
             
@@ -1539,3 +1767,4 @@ Lisa,Garcia,lisa.garcia@example.com,E-commerce Plus,555-0135,Marketing Lead`;
     </script>
 </body>
 </html>
+
