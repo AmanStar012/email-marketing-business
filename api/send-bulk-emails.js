@@ -238,7 +238,64 @@ module.exports = async function handler(req, res) {
     email: 'charvi@mywallstudio.shop',
     password: 'nrhwoiuiiekfflye', 
     active: false
-    }
+    },
+    {
+  id: 33,
+  name: 'Account 33',
+  email: 'anvi@grynowinfluence.shop',
+  password: 'puxgifpfininrdez',
+  active: false
+},
+{
+  id: 34,
+  name: 'Account 34',
+  email: 'charvi@grynowinfluence.shop',
+  password: 'frvbvandhbgvfcnn',
+  active: false
+},
+{
+  id: 35,
+  name: 'Account 35',
+  email: 'ira@grynowinfluence.shop',
+  password: 'hsjxycgghxjzckcy',
+  active: false
+},
+{
+  id: 36,
+  name: 'Account 36',
+  email: 'myra@grynowinfluence.shop',
+  password: 'uomdavlywyahxqkf',
+  active: false
+},
+{
+  id: 37,
+  name: 'Account 37',
+  email: 'kavya@grynowinfluence.shop',
+  password: 'kjefdqfsaolkslts',
+  active: false
+},
+{
+  id: 38,
+  name: 'Account 38',
+  email: 'tanvi@grynowinfluence.shop',
+  password: 'nbvjfvzsxovhybko',
+  active: false
+},
+{
+  id: 39,
+  name: 'Account 39',
+  email: 'riya@grynowinfluence.shop',
+  password: 'uiaonyoctycvhcxo',
+  active: false
+},
+{
+  id: 40,
+  name: 'Account 40',
+  email: 'saanvi@grynowinfluence.shop',
+  password: 'inthxtokghhnuyww',
+  active: false
+}
+    
 
     ];
 
@@ -381,4 +438,5 @@ function convertTextToHTML(text) {
     .replace(/^/, '<div style="white-space: pre-wrap; font-family: Arial, sans-serif; line-height: 1.6; color: #333;">')
     .replace(/$/, '</div>');
 }
+
 
