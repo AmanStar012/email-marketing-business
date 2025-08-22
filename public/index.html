@@ -1,429 +1,1541 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Email Marketing Business - Rich Editor + Template Manager</title>
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body{
-      font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-      background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
-      min-height:100vh;padding:20px;color:#333;
-    }
-    .container{max-width:1400px;margin:0 auto;background:rgba(255,255,255,.95);border-radius:24px;
-      box-shadow:0 30px 60px rgba(0,0,0,.1);overflow:hidden;backdrop-filter:blur(10px);}
-    .header{background:linear-gradient(135deg,#2c3e50 0%,#3498db 100%);color:#fff;padding:30px;text-align:center;
-      position:relative;overflow:hidden;}
-    .header h1{font-size:2.5em;margin-bottom:10px;font-weight:700;position:relative;z-index:1;}
-    .header p{font-size:1.1em;opacity:.9;position:relative;z-index:1;}
-    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-top:30px;position:relative;z-index:1;}
-    .stat-card{background:rgba(255,255,255,.15);padding:20px;border-radius:16px;text-align:center;backdrop-filter:blur(10px);
-      border:1px solid rgba(255,255,255,.2);transition:transform .3s ease;}
-    .stat-card:hover{transform:translateY(-5px);}
-    .stat-number{font-size:2.5em;font-weight:700;display:block;margin-bottom:5px;}
-    .stat-label{font-size:.9em;opacity:.9;}
-    .main-content{display:grid;grid-template-columns:1fr 1fr;gap:30px;padding:40px;}
-    .section{background:#fff;border-radius:20px;padding:30px;box-shadow:0 10px 30px rgba(0,0,0,.05);
-      border:1px solid rgba(0,0,0,.05);transition:transform .3s ease, box-shadow .3s ease;}
-    .section:hover{transform:translateY(-2px);box-shadow:0 15px 40px rgba(0,0,0,.1);}
-    .section-header{display:flex;align-items:center;margin-bottom:25px;gap:15px;}
-    .section-icon{width:40px;height:40px;background:linear-gradient(135deg,#3498db,#2980b9);border-radius:12px;
-      display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:600;}
-    .section-title{font-size:1.4em;font-weight:600;color:#2c3e50;}
-    .upload-zone{border:3px dashed #3498db;border-radius:16px;padding:40px;text-align:center;
-      background:linear-gradient(135deg,#f8f9ff,#e3f2fd);transition:all .3s ease;cursor:pointer;position:relative;overflow:hidden;}
-    .upload-zone:hover{border-color:#2980b9;background:linear-gradient(135deg,#e3f2fd,#d1e7dd);transform:scale(1.02);}
-    .upload-zone.dragover{border-color:#27ae60;background:linear-gradient(135deg,#d1e7dd,#c3e6cb);transform:scale(1.05);}
-    .upload-icon{font-size:3.5em;margin-bottom:20px;color:#3498db;}
-    .upload-text{font-size:1.1em;margin-bottom:15px;color:#2c3e50;}
-    .upload-subtitle{font-size:.9em;color:#7f8c8d;margin-bottom:20px;}
-    .btn{background:linear-gradient(135deg,#3498db,#2980b9);color:#fff;border:none;padding:12px 24px;border-radius:10px;
-      cursor:pointer;font-size:14px;font-weight:600;transition:all .3s ease;display:inline-flex;align-items:center;gap:8px;
-      text-decoration:none;position:relative;overflow:hidden;}
-    .btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(52,152,219,.3);}
-    .btn-success{background:linear-gradient(135deg,#27ae60,#229954);}
-    .btn-danger{background:linear-gradient(135deg,#e74c3c,#c0392b);}
-    .btn-secondary{background:linear-gradient(135deg,#6c757d,#5a6268);}
-    .btn-small{padding:8px 16px;font-size:12px;}
-    .form-group{margin-bottom:25px;}
-    .form-label{display:block;margin-bottom:8px;font-weight:600;color:#2c3e50;font-size:14px;}
-    .form-control{width:100%;padding:12px 16px;border:2px solid #e9ecef;border-radius:10px;font-size:14px;
-      transition:all .3s ease;background:#fff;}
-    .form-control:focus{outline:none;border-color:#3498db;box-shadow:0 0 0 3px rgba(52,152,219,.1);}
-    .merge-fields{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
-    .merge-field{background:linear-gradient(135deg,#3498db,#2980b9);color:#fff;padding:8px 16px;border-radius:20px;
-      font-size:12px;cursor:pointer;transition:all .3s ease;border:none;font-weight:500;}
-    .contacts-preview{background:#f8f9fa;border-radius:12px;padding:20px;margin-top:20px;max-height:300px;overflow-y:auto;border:1px solid #e9ecef;}
-    .contact-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #e9ecef;}
-    .email-accounts{display:grid;gap:20px;margin-bottom:25px;}
-    .email-account{background:#f8f9fa;padding:20px;border-radius:12px;border:2px solid #e9ecef;}
-    .email-account.connected{border-color:#27ae60;background:linear-gradient(135deg,#d1e7dd,#c3e6cb);}
-    .active-account{border:2px solid #27ae60 !important;background:linear-gradient(135deg,#d1e7dd,#c3e6cb) !important;
-      box-shadow:0 0 15px rgba(39,174,96,.3);}
-    .progress-container{padding:30px;background:#fff;margin:20px 30px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.05);}
-    .progress-bar{width:100%;height:12px;background:#e9ecef;border-radius:6px;overflow:hidden;margin-bottom:20px;position:relative;}
-    .progress-fill{height:100%;background:linear-gradient(90deg,#3498db,#2980b9);width:0%;transition:width .5s ease;}
-    .log-area{background:#2c3e50;color:#ecf0f1;padding:20px;border-radius:12px;font-family:'JetBrains Mono','Fira Code',monospace;
-      font-size:13px;max-height:300px;overflow-y:auto;line-height:1.6;}
-    /* Rich editor */
-    .editor-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center;}
-    .editor-btn{border:1px solid #e9ecef;background:#fff;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;}
-    .editor-btn:hover{background:#f4f6f8;}
-    .heading-select{border:1px solid #e9ecef;background:#fff;padding:6px 10px;border-radius:8px;font-size:13px;font-weight:600;}
-    .rich-editor{width:100%;min-height:160px;padding:12px 16px;border:2px solid #e9ecef;border-radius:10px;font-size:14px;
-      line-height:1.6;background:#fff;outline:none;}
-    .rich-editor:focus{border-color:#3498db;box-shadow:0 0 0 3px rgba(52,152,219,.1);}
-    .rich-editor a{color:#1f6feb;text-decoration:underline;}
-    .template-manager .tm-row{margin-top:10px;}
-    @media (max-width:768px){.main-content{grid-template-columns:1fr;gap:20px;padding:20px;}}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Marketing Business - Multiple account System (Rich Editor)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.15);
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 40px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 15px;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .upload-zone {
+            border: 3px dashed #3498db;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            background: linear-gradient(135deg, #f8f9ff, #e3f2fd);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-zone:hover {
+            border-color: #2980b9;
+            background: linear-gradient(135deg, #e3f2fd, #d1e7dd);
+            transform: scale(1.02);
+        }
+
+        .upload-zone.dragover {
+            border-color: #27ae60;
+            background: linear-gradient(135deg, #d1e7dd, #c3e6cb);
+            transform: scale(1.05);
+        }
+
+        .upload-icon {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            color: #3498db;
+        }
+
+        .upload-text {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .upload-subtitle {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #229954);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .form-control-textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
+        }
+
+        .merge-fields {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .merge-field {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-weight: 500;
+        }
+
+        .merge-field:hover {
+            background: linear-gradient(135deg, #2980b9, #1f4e79);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .contacts-preview {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+        }
+
+        .contacts-preview h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .contact-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+            transition: background 0.3s ease;
+        }
+
+        .contact-item:hover {
+            background: rgba(52, 152, 219, 0.05);
+        }
+
+        .contact-item:last-child {
+            border-bottom: none;
+        }
+
+        .contact-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .contact-email {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .email-accounts {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .email-account {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .email-account.connected {
+            border-color: #27ae60;
+            background: linear-gradient(135deg, #d1e7dd, #c3e6cb);
+        }
+
+        .email-account.disconnected {
+            border-color: #e74c3c;
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+        }
+
+        .active-account {
+            border: 2px solid #27ae60 !important;
+            background: linear-gradient(135deg, #d1e7dd, #c3e6cb) !important;
+            box-shadow: 0 0 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .active-account .account-email {
+            font-weight: bold;
+            color: #155724;
+        }
+
+        .account-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .account-email {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .account-provider {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .account-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .progress-container {
+            padding: 30px;
+            background: white;
+            margin: 20px 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e9ecef;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            width: 0%;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .log-area {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+            padding: 4px 0;
+            border-radius: 4px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .log-success { color: #2ecc71; }
+        .log-error { color: #e74c3c; }
+        .log-warning { color: #f39c12; }
+        .log-info { color: #3498db; }
+
+        .account-selector {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #e9ecef;
+        }
+
+        .selector-title {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .selector-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .active-info {
+            font-size: 13px;
+            color: #666;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        /* --- Rich editor --- */
+        .editor-toolbar{
+          display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; align-items:center;
+        }
+        .editor-btn{
+          border:1px solid #e9ecef; background:#fff; padding:6px 10px; border-radius:8px;
+          cursor:pointer; font-size:13px; font-weight:600;
+        }
+        .editor-btn:hover{ background:#f4f6f8; }
+        .heading-select{
+          border:1px solid #e9ecef; background:#fff; padding:6px 10px; border-radius:8px;
+          font-size:13px; font-weight:600;
+        }
+        .rich-editor{
+          width:100%; min-height:160px; padding:12px 16px; border:2px solid #e9ecef; border-radius:10px;
+          font-size:14px; line-height:1.6; background:#fff; outline:none;
+        }
+        .rich-editor:focus{ border-color:#3498db; box-shadow:0 0 0 3px rgba(52,152,219,.1); }
+        .rich-editor a{ color:#1f6feb; text-decoration:underline; }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>🚀 Email Marketing Business</h1>
-      <p>5-Account Gmail System with Auto-Rotation</p>
-      <div class="stats-grid">
-        <div class="stat-card"><span class="stat-number" id="totalSent">0</span><span class="stat-label">Emails Sent</span></div>
-        <div class="stat-card"><span class="stat-number" id="successRate">0%</span><span class="stat-label">Success Rate</span></div>
-        <div class="stat-card"><span class="stat-number" id="inQueue">0</span><span class="stat-label">In Queue</span></div>
-        <div class="stat-card"><span class="stat-number" id="failedCount">0</span><span class="stat-label">Failed</span></div>
-      </div>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Email Marketing Business</h1>
+            <p>5-Account Gmail System with Auto-Rotation</p>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number" id="totalSent">0</span>
+                    <span class="stat-label">Emails Sent</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="successRate">0%</span>
+                    <span class="stat-label">Success Rate</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="inQueue">0</span>
+                    <span class="stat-label">In Queue</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="failedCount">0</span>
+                    <span class="stat-label">Failed</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Left Column -->
+            <div class="left-column">
+                <!-- Upload Contacts -->
+                <div class="section">
+                    <div class="section-header">
+                        <div class="section-icon">1</div>
+                        <div class="section-title">Upload Contacts</div>
+                    </div>
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-icon">📋</div>
+                        <div class="upload-text">Drop your CSV file here</div>
+                        <div class="upload-subtitle">or click to browse</div>
+                        <input type="file" id="csvInput" accept=".csv" style="display: none;">
+                        <button class="btn btn-small" onclick="document.getElementById('csvInput').click()">
+                            📁 Choose File
+                        </button>
+                    </div>
+                    <div class="contacts-preview" id="contactsPreview" style="display: none;">
+                        <h3>📊 Contacts Preview</h3>
+                        <div id="contactsList"></div>
+                    </div>
+                </div>
+
+                <!-- Email Template -->
+                <div class="section">
+                    <div class="section-header">
+                        <div class="section-icon">2</div>
+                        <div class="section-title">Email Template</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Template Name</label>
+                        <input type="text" class="form-control" id="templateName" placeholder="My Marketing Campaign">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Subject Line</label>
+                        <input type="text" class="form-control" id="subjectLine" placeholder="Hello {{firstName}}, exclusive offer for {{company}}!">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Merge Fields</label>
+                        <div class="merge-fields" id="mergeFields"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Content</label>
+
+                        <!-- Toolbar -->
+                        <div class="editor-toolbar">
+                            <button type="button" class="editor-btn" onclick="fmt('bold')"><b>B</b></button>
+                            <button type="button" class="editor-btn" onclick="fmt('italic')"><i>I</i></button>
+                            <button type="button" class="editor-btn" onclick="fmt('underline')"><u>U</u></button>
+                            <button type="button" class="editor-btn" onclick="fmt('insertUnorderedList')">• Bullets</button>
+                            <button type="button" class="editor-btn" onclick="fmt('insertOrderedList')">1. Numbers</button>
+                            <select class="heading-select" onchange="applyHeading(this.value)">
+                                <option value="P">Paragraph</option>
+                                <option value="H2">Heading 2</option>
+                                <option value="H3">Heading 3</option>
+                            </select>
+                            <button type="button" class="editor-btn" onclick="makeLink()">🔗 Link</button>
+                            <button type="button" class="editor-btn" onclick="unlink()">✖️ Unlink</button>
+                            <button type="button" class="editor-btn" onclick="clearFormat()">🧹 Clear</button>
+                        </div>
+
+                        <!-- ContentEditable editor -->
+                        <div id="emailEditor" class="rich-editor" contenteditable="true">
+                          Dear {{firstName}},<br><br>
+                          Hope you're doing well! I wanted to reach out about...<br><br>
+                          Best regards,<br>
+                          Your Name
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="right-column">
+                <!-- Campaign Settings -->
+                <div class="section">
+                    <div class="section-header">
+                        <div class="section-icon">3</div>
+                        <div class="section-title">Campaign Settings</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Campaign Name</label>
+                        <input type="text" class="form-control" id="campaignName" placeholder="Q1 2024 Newsletter">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Send Rate</label>
+                        <select class="form-control" id="sendRate">
+                            <option value="30">30 emails/hour per account</option>
+                            <option value="40">40 emails/hour per account</option>
+                            <option value="50">50 emails/hour per account</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Schedule</label>
+                        <select class="form-control" id="schedule">
+                            <option value="immediate">Send Now</option>
+                            <option value="scheduled">Schedule for Later</option>
+                            <option value="drip">Drip Campaign</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-success" id="startCampaign">
+                        🚀 Launch Campaign
+                    </button>
+                </div>
+
+                <!-- Email Accounts -->
+                <div class="section">
+                    <div class="section-header">
+                        <div class="section-icon">4</div>
+                        <div class="section-title">Email Accounts (Multiple Account System)</div>
+                    </div>
+                    <div class="email-accounts" id="emailAccounts"></div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-small" id="previewBtn">👁️ Preview</button>
+                        <button class="btn btn-small" id="testBtn">🧪 Test Send</button>
+                        <button class="btn btn-small" id="saveBtn">💾 Save Template</button>
+                        <button class="btn btn-small btn-secondary" id="downloadSample">📥 Sample CSV</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="log-area" id="logArea">
+                <div class="log-entry log-info">[SYSTEM] Business Email Marketing Pro initialized</div>
+                <div class="log-entry log-info">[SYSTEM] Auto-rotation enabled - 40 emails per account</div>
+            </div>
+        </div>
     </div>
 
-    <div class="main-content">
-      <div class="left-column">
-        <div class="section">
-          <div class="section-header"><div class="section-icon">1</div><div class="section-title">Upload Contacts</div></div>
-          <div class="upload-zone" id="uploadZone">
-            <div class="upload-icon">📋</div>
-            <div class="upload-text">Drop your CSV file here</div>
-            <div class="upload-subtitle">or click to browse</div>
-            <input type="file" id="csvInput" accept=".csv" style="display:none;">
-            <button class="btn btn-small" onclick="document.getElementById('csvInput').click()">📁 Choose File</button>
-          </div>
-          <div class="contacts-preview" id="contactsPreview" style="display:none;">
-            <h3>📊 Contacts Preview</h3>
-            <div id="contactsList"></div>
-          </div>
-        </div>
+    <script>
+        // Global State
+        const state = {
+            contacts: [],
+            emailAccounts: [],
+            currentCampaign: null,
+            stats: {
+                totalSent: 0,
+                successRate: 0,
+                inQueue: 0,
+                failed: 0
+            }
+        };
 
-        <div class="section">
-          <div class="section-header"><div class="section-icon">2</div><div class="section-title">Email Template</div></div>
-          <div class="form-group">
-            <label class="form-label">Template Name</label>
-            <input type="text" class="form-control" id="templateName" placeholder="My Marketing Campaign">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Subject Line</label>
-            <input type="text" class="form-control" id="subjectLine" placeholder="Hello {{firstName}}, exclusive offer for {{company}}!">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Merge Fields</label>
-            <div class="merge-fields" id="mergeFields"></div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Email Content</label>
-            <div class="editor-toolbar">
-              <button type="button" class="editor-btn" onclick="fmt('bold')"><b>B</b></button>
-              <button type="button" class="editor-btn" onclick="fmt('italic')"><i>I</i></button>
-              <button type="button" class="editor-btn" onclick="fmt('underline')"><u>U</u></button>
-              <button type="button" class="editor-btn" onclick="fmt('insertUnorderedList')">• Bullets</button>
-              <button type="button" class="editor-btn" onclick="fmt('insertOrderedList')">1. Numbers</button>
-              <select class="heading-select" onchange="applyHeading(this.value)">
-                <option value="P">Paragraph</option>
-                <option value="H2">Heading 2</option>
-                <option value="H3">Heading 3</option>
-              </select>
-              <button type="button" class="editor-btn" onclick="makeLink()">🔗 Link</button>
-              <button type="button" class="editor-btn" onclick="unlink()">✖️ Unlink</button>
-              <button type="button" class="editor-btn" onclick="clearFormat()">🧹 Clear</button>
-            </div>
-            <div id="emailEditor" class="rich-editor" contenteditable="true">
-              Dear {{firstName}},<br><br>
-              Hope you're doing well! I wanted to reach out about...<br><br>
-              Best regards,<br>
-              Your Name
-            </div>
-          </div>
+        // API Client
+        class EmailMarketingAPI {
+            constructor(baseURL = '') {
+                this.baseURL = baseURL;
+            }
 
-          <!-- Template Manager -->
-          <div class="template-manager">
-            <div class="tm-row">
-              <label class="form-label" style="margin-bottom:6px;">Saved Templates</label>
-              <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                <select id="templateList" class="form-control" style="max-width:360px;"></select>
-                <button class="btn btn-small" onclick="tm.loadSelected()">Load</button>
-                <button class="btn btn-small btn-danger" onclick="tm.deleteSelected()">Delete</button>
-                <button class="btn btn-small" onclick="tm.exportSelected()">Export</button>
-                <input type="file" id="importTemplates" accept="application/json" hidden>
-                <button class="btn btn-small btn-secondary" onclick="document.getElementById('importTemplates').click()">Import</button>
-              </div>
-            </div>
-            <div class="tm-row" style="margin-top:12px;">
-              <label class="form-label" style="margin-bottom:6px;">Save / Update</label>
-              <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                <input type="text" class="form-control" id="templateName2" placeholder="My Marketing Campaign" style="max-width:360px; display:none;">
-                <button class="btn btn-small btn-success" onclick="tm.saveCurrent()">💾 Save New</button>
-                <button class="btn btn-small" onclick="tm.updateCurrent()">↻ Update Selected</button>
-                <button class="btn btn-small" onclick="tm.duplicateSelected()">⧉ Duplicate</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+            async sendEmail(emailData) {
+                try {
+                    const response = await fetch(`${this.baseURL}/api/send-email`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(emailData)
+                    });
 
-      <div class="right-column">
-        <div class="section">
-          <div class="section-header"><div class="section-icon">3</div><div class="section-title">Campaign Settings</div></div>
-          <div class="form-group">
-            <label class="form-label">Campaign Name</label>
-            <input type="text" class="form-control" id="campaignName" placeholder="Q1 2024 Newsletter">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Send Rate</label>
-            <select class="form-control" id="sendRate">
-              <option value="30">30 emails/hour per account</option>
-              <option value="40">40 emails/hour per account</option>
-              <option value="50">50 emails/hour per account</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Schedule</label>
-            <select class="form-control" id="schedule">
-              <option value="immediate">Send Now</option>
-              <option value="scheduled">Schedule for Later</option>
-              <option value="drip">Drip Campaign</option>
-            </select>
-          </div>
-          <button class="btn btn-success" id="startCampaign">🚀 Launch Campaign</button>
-        </div>
+                    const result = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(result.error || 'Failed to send email');
+                    }
 
-        <div class="section">
-          <div class="section-header"><div class="section-icon">4</div><div class="section-title">Email Accounts (Multiple Account System)</div></div>
-          <div class="email-accounts" id="emailAccounts"></div>
-          <div class="action-buttons">
-            <button class="btn btn-small" id="previewBtn">👁️ Preview</button>
-            <button class="btn btn-small" id="testBtn">🧪 Test Send</button>
-            <button class="btn btn-small" id="saveBtn" onclick="tm.saveCurrent()">💾 Save Template</button>
-            <button class="btn btn-small btn-secondary" id="downloadSample">📥 Sample CSV</button>
-          </div>
-        </div>
-      </div>
-    </div>
+                    return result;
+                } catch (error) {
+                    console.error('Send email error:', error);
+                    throw error;
+                }
+            }
 
-    <div class="progress-container">
-      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-      <div class="log-area" id="logArea">
-        <div class="log-entry log-info">[SYSTEM] Business Email Marketing Pro initialized</div>
-        <div class="log-entry log-info">[SYSTEM] Auto-rotation enabled - 40 emails per account</div>
-      </div>
-    </div>
-  </div>
+            async sendBulkEmails(bulkData) {
+                try {
+                    const response = await fetch(`${this.baseURL}/api/send-bulk-emails`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(bulkData)
+                    });
 
-  <script>
-    // ===== App State =====
-    const state = { contacts:[], emailAccounts:[], stats:{ totalSent:0, successRate:0, inQueue:0, failed:0 } };
+                    const result = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(result.error || 'Failed to send bulk emails');
+                    }
 
-    // ===== API client (stub) =====
-    class EmailMarketingAPI{
-      constructor(baseURL=''){ this.baseURL = baseURL; }
-      async sendEmail(emailData){ return {success:true, messageId:'demo'}; }
-      async sendBulkEmails(bulkData){ return {success:true, results:{ usedAccount:'demo@acme.com', sent: state.contacts.length, failed:0, successRate:100, accountSwitches:[], errors:[] }}; }
-    }
-    const emailAPI = new EmailMarketingAPI();
+                    return result;
+                } catch (error) {
+                    console.error('Bulk email error:', error);
+                    throw error;
+                }
+            }
+        }
 
-    document.addEventListener('DOMContentLoaded', initializeApp);
-    function initializeApp(){
-      setupEventListeners(); loadDemoAccounts(); updateStats(); tm.init(); log('5-Account Email Marketing Pro initialized','info');
-    }
-    function setupEventListeners(){
-      initializeUploadZone();
-      document.getElementById('startCampaign').addEventListener('click', startCampaign);
-      document.getElementById('previewBtn').addEventListener('click', previewEmail);
-      document.getElementById('testBtn').addEventListener('click', sendTestEmail);
-      document.getElementById('downloadSample').addEventListener('click', downloadSampleCSV);
-    }
+        // Initialize API client
+        const emailAPI = new EmailMarketingAPI();
 
-    // ===== Upload / CSV =====
-    function initializeUploadZone(){
-      const uploadZone=document.getElementById('uploadZone'); const csvInput=document.getElementById('csvInput');
-      uploadZone.addEventListener('click', e=>{e.preventDefault(); csvInput.click();});
-      uploadZone.addEventListener('dragover', e=>{e.preventDefault(); uploadZone.classList.add('dragover');});
-      uploadZone.addEventListener('dragleave', e=>uploadZone.classList.remove('dragover'));
-      uploadZone.addEventListener('drop', e=>{e.preventDefault(); uploadZone.classList.remove('dragover'); if(e.dataTransfer.files.length){ processFile(e.dataTransfer.files[0]); }});
-      csvInput.addEventListener('change', e=>{ if(e.target.files[0]) processFile(e.target.files[0]); });
-    }
-    function processFile(file){
-      if(!file) return log('No file selected','error');
-      if(!file.name.toLowerCase().endsWith('.csv')) return log('Please select a CSV file','error');
-      const reader=new FileReader();
-      reader.onload=e=>parseCSV(e.target.result);
-      reader.onerror=()=>log('Error reading file','error');
-      reader.readAsText(file);
-    }
-    function parseCSV(csv){
-      const lines=csv.split('\n').filter(l=>l.trim()!==''); if(lines.length<2) return log('CSV needs header + 1 row','error');
-      const headers=parseCSVLine(lines[0]); state.contacts=[];
-      for(let i=1;i<lines.length;i++){ const vals=parseCSVLine(lines[i]); const c={}; headers.forEach((h,idx)=>c[h]=vals[idx]||''); if(c.email||c.Email||c.EMAIL||c.name||c.Name) state.contacts.push(c); }
-      displayContacts(); updateMergeFields(headers); updateStats(); log(`✅ Loaded ${state.contacts.length} contacts`,'success');
-    }
-    function parseCSVLine(line){
-      const out=[]; let cur='', q=false; for(let i=0;i<line.length;i++){ const ch=line[i], nx=line[i+1];
-        if(ch=='"'){ if(q&&nx=='"'){ cur+='"'; i++; } else { q=!q; } }
-        else if(ch==',' && !q){ out.push(cur.trim()); cur=''; } else { cur+=ch; } }
-      out.push(cur.trim()); return out.map(s=>s.replace(/^"(.*)"$/,'$1').trim());
-    }
-    function displayContacts(){
-      const preview=document.getElementById('contactsPreview'); const list=document.getElementById('contactsList');
-      preview.style.display='block'; list.innerHTML='';
-      const show=state.contacts.slice(0,10);
-      show.forEach(c=>{ const d=document.createElement('div'); d.className='contact-item';
-        d.innerHTML=`<div><div class="contact-name">${getContactName(c)}</div><div class="contact-email">${getContactEmail(c)}</div></div>`;
-        list.appendChild(d);
-      });
-      if(state.contacts.length>10){ const more=document.createElement('div'); more.className='contact-item'; more.textContent=`...and ${state.contacts.length-10} more contacts`; list.appendChild(more); }
-    }
-    function getContactName(c){ const fn=c.firstName||c.first_name||c['First Name']||''; const ln=c.lastName||c.last_name||c['Last Name']||''; const full=c.name||c.Name||''; return (fn||ln)?`${fn} ${ln}`.trim():(full|| (getContactEmail(c).split('@')[0]||'Contact')); }
-    function getContactEmail(c){ return c.email||c.Email||c.EMAIL||c['Email Address']||c.email_address||c.mail||c.Mail||''; }
-    function updateMergeFields(headers){
-      const container=document.getElementById('mergeFields'); container.innerHTML='';
-      headers.forEach(h=>{ const b=document.createElement('button'); b.className='merge-field'; b.textContent=`{{${h}}}`; b.onclick=()=>insertMergeField(`{{${h}}}`); container.appendChild(b); });
-    }
-    function insertMergeField(field){ insertAtCaret(field); }
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
 
-    // ===== Rich Editor helpers =====
-    function fmt(cmd){ document.execCommand(cmd,false,null); }
-    function applyHeading(tag){ document.execCommand('formatBlock',false, tag==='P'?'P':tag); document.getElementById('emailEditor').focus(); }
-    function makeLink(){ const url=prompt('Enter URL (https://...)'); if(!url) return; const sel=window.getSelection();
-      if(sel && sel.isCollapsed){ document.execCommand('insertText',false,url); selectLastInserted(url); } document.execCommand('createLink',false,url); }
-    function unlink(){ document.execCommand('unlink',false,null); }
-    function clearFormat(){ document.execCommand('removeFormat',false,null); document.execCommand('unlink',false,null); }
-    function selectLastInserted(text){ const ed=document.getElementById('emailEditor'); const w=document.createTreeWalker(ed,NodeFilter.SHOW_TEXT,null,false); let n,found=null; while((n=w.nextNode())){ const i=n.nodeValue.lastIndexOf(text); if(i!==-1) found={node:n,idx:i}; }
-      if(found){ const r=document.createRange(); r.setStart(found.node,found.idx); r.setEnd(found.node,found.idx+text.length); const s=window.getSelection(); s.removeAllRanges(); s.addRange(r); } }
-    function getEditorHTML(){ return document.getElementById('emailEditor').innerHTML; }
-    function setEditorHTML(html){ document.getElementById('emailEditor').innerHTML = html || ''; }
-    function insertAtCaret(html){ const ed=document.getElementById('emailEditor'); ed.focus(); const sel=window.getSelection(); if(!sel||!sel.rangeCount) return; const r=sel.getRangeAt(0);
-      r.deleteContents(); const tmp=document.createElement('span'); tmp.innerHTML=html; const frag=document.createDocumentFragment(); let node,last; while((node=tmp.firstChild)){ last=frag.appendChild(node); } r.insertNode(frag); if(last){ r.setStartAfter(last); r.collapse(true); sel.removeAllRanges(); sel.addRange(r); } }
+        function initializeApp() {
+            setupEventListeners();
+            loadDemoAccounts();
+            updateStats();
+            log('5-Account Email Marketing Pro initialized', 'info');
+        }
 
-    // ===== Template Manager (localStorage) =====
-    const tm={
-      LS_KEY:'emailTemplates_v1',
-      init(){ const imp=document.getElementById('importTemplates'); if(imp) imp.addEventListener('change', this.importFiles.bind(this)); this.renderList(); },
-      _read(){ try{return JSON.parse(localStorage.getItem(this.LS_KEY)||'[]');}catch{return [];} },
-      _write(list){ localStorage.setItem(this.LS_KEY, JSON.stringify(list)); },
-      _getCurrent(){ return { name: document.getElementById('templateName').value?.trim() || 'Untitled Template',
-        subject: document.getElementById('subjectLine').value || '', content: getEditorHTML(), timestamp: new Date().toISOString() }; },
-      renderList(){ const list=this._read(); const sel=document.getElementById('templateList'); if(!sel) return; sel.innerHTML='';
-        if(list.length===0){ const opt=document.createElement('option'); opt.value=''; opt.textContent='— No saved templates —'; sel.appendChild(opt); return; }
-        list.forEach((t,i)=>{ const o=document.createElement('option'); o.value=String(i); o.textContent=`${t.name} · ${new Date(t.timestamp).toLocaleString()}`; sel.appendChild(o); });
-      },
-      saveCurrent(){ const tpl=this._getCurrent(); let list=this._read(); const base=tpl.name; let name=base, n=2; while(list.some(x=>x.name===name)) name=`${base} (${n++})`; tpl.name=name; list.unshift(tpl); this._write(list); this.renderList(); log(`💾 Saved template "${tpl.name}"`,'success'); },
-      updateCurrent(){ const sel=document.getElementById('templateList'); if(!sel||!sel.value) return log('Select a template to update','warning'); const idx=Number(sel.value); const list=this._read(); if(!list[idx]) return;
-        const updated=this._getCurrent(); updated.name=document.getElementById('templateName').value?.trim() || list[idx].name; list[idx]=updated; this._write(list); this.renderList(); sel.value=String(idx); log(`↻ Updated "${updated.name}"`,'success'); },
-      loadSelected(){ const sel=document.getElementById('templateList'); if(!sel||!sel.value) return; const idx=Number(sel.value); const tpl=this._read()[idx]; if(!tpl) return;
-        document.getElementById('templateName').value = tpl.name; document.getElementById('subjectLine').value = tpl.subject || ''; setEditorHTML(tpl.content || ''); log(`📥 Loaded "${tpl.name}"`,'info'); },
-      deleteSelected(){ const sel=document.getElementById('templateList'); if(!sel||!sel.value) return; const idx=Number(sel.value); const list=this._read(); const tpl=list[idx]; if(!tpl) return;
-        if(!confirm(`Delete template "${tpl.name}"?`)) return; list.splice(idx,1); this._write(list); this.renderList(); log(`🗑️ Deleted "${tpl.name}"`,'warning'); },
-      duplicateSelected(){ const sel=document.getElementById('templateList'); if(!sel||!sel.value) return; const idx=Number(sel.value); const list=this._read(); const tpl=list[idx]; if(!tpl) return;
-        const copy={...tpl, name:`${tpl.name} (copy)`, timestamp:new Date().toISOString()}; list.unshift(copy); this._write(list); this.renderList(); log(`⧉ Duplicated "${tpl.name}"`,'success'); },
-      exportSelected(){ const sel=document.getElementById('templateList'); const list=this._read(); let payload,name;
-        if(sel && sel.value){ const idx=Number(sel.value); const tpl=list[idx]; if(!tpl) return; payload=[tpl]; name=`template_${tpl.name.replace(/[^a-z0-9_-]+/gi,'_')}.json`; }
-        else { payload=list; name=`templates_export_${Date.now()}.json`; }
-        const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=name; a.click(); URL.revokeObjectURL(url); log(`📤 Exported ${payload.length} template(s)`,'success'); },
-      importFiles(evt){ const file=evt.target.files?.[0]; if(!file) return; const rd=new FileReader();
-        rd.onload=()=>{ try{ const inc=JSON.parse(rd.result||'[]'); if(!Array.isArray(inc)) throw new Error('Invalid JSON format'); const list=this._read();
-          inc.forEach(t=>{ if(!t||!t.name) return; let name=t.name, n=2; while(list.some(x=>x.name===name)) name=`${t.name} (${n++})`; list.unshift({...t,name,timestamp:new Date().toISOString()}); });
-          this._write(list); this.renderList(); log(`📥 Imported ${inc.length} template(s)`,'success'); } catch(e){ log(`❌ Import failed: ${e.message}`,'error'); } finally { evt.target.value=''; } };
-        rd.readAsText(file); }
-    };
-    function saveTemplate(){ tm.saveCurrent(); } // shim
+        function setupEventListeners() {
+            // Initialize upload zone
+            initializeUploadZone();
+            
+            // Other event listeners
+            document.getElementById('startCampaign').addEventListener('click', startCampaign);
+            document.getElementById('previewBtn').addEventListener('click', previewEmail);
+            document.getElementById('testBtn').addEventListener('click', sendTestEmail);
+            document.getElementById('saveBtn').addEventListener('click', saveTemplate);
+            document.getElementById('downloadSample').addEventListener('click', downloadSampleCSV);
+        }
 
-    // ===== Accounts, Campaign, Preview =====
-    function loadDemoAccounts(){ state.emailAccounts=[
-    {id:1,email:'aprajita@vidzy.in',provider:'Gmail Account 1',connected:true,sentCount:0,maxSends:40,active:true},
-    {id:2,email:'aman@vidzy.in',provider:'Gmail Account 2',connected:true,sentCount:0,maxSends:40,active:false},
-    { id: 3,  email: 'khushigupta@vidzy.in',      provider: 'Gmail Account 3',  connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 4,  email: 'vasu@vidzy.in',             provider: 'Gmail Account 4',  connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 5,  email: 'arshad@vidzy.in',           provider: 'Gmail Account 5',  connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 6,  email: 'mayank@vidzy.in',           provider: 'Gmail Account 6',  connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 7,  email: 'vibhanshu@vidzy.in',        provider: 'Gmail Account 7',  connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 8,  email: 'diya@mywallbrands.shop',    provider: 'Gmail Account 8',  connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 9,  email: 'ananya@mywallsocial.shop',  provider: 'Gmail Account 9',  connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 10, email: 'riya@mywallsocial.shop',    provider: 'Gmail Account 10', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 11, email: 'ishita@mywallsocial.shop',  provider: 'Gmail Account 11', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 12, email: 'saanvi@mywallsocial.shop',  provider: 'Gmail Account 12', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 13, email: 'tanvi@mywallsocial.shop',   provider: 'Gmail Account 13', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 14, email: 'kavya@mywallsocial.shop',   provider: 'Gmail Account 14', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 15, email: 'myra@mywallsocial.shop',    provider: 'Gmail Account 15', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 16, email: 'ira@mywallsocial.shop',     provider: 'Gmail Account 16', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 17, email: 'charvi@mywallsocial.shop',  provider: 'Gmail Account 17', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 18, email: 'diya@mywallbrands.shop',    provider: 'Gmail Account 18', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 19, email: 'ananya@mywallbrands.shop',  provider: 'Gmail Account 19', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 20, email: 'riya@mywallbrands.shop',    provider: 'Gmail Account 20', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 21, email: 'ishita@mywallbrands.shop',  provider: 'Gmail Account 21', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 22, email: 'saanvi@mywallbrands.shop',  provider: 'Gmail Account 22', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 23, email: 'tanvi@mywallbrands.shop',   provider: 'Gmail Account 23', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 24, email: 'kavya@mywallbrands.shop',   provider: 'Gmail Account 24', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 25, email: 'myra@mywallbrands.shop',    provider: 'Gmail Account 25', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 26, email: 'ira@mywallbrands.shop',     provider: 'Gmail Account 26', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 27, email: 'charvi@mywallbrands.shop',  provider: 'Gmail Account 27', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 28, email: 'diya@mywallstudio.shop',    provider: 'Gmail Account 28', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 29, email: 'ananya@mywallstudio.shop',  provider: 'Gmail Account 29', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 30, email: 'riya@mywallstudio.shop',    provider: 'Gmail Account 30', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 31, email: 'ira@mywallstudio.shop',     provider: 'Gmail Account 31', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 32, email: 'charvi@mywallstudio.shop',  provider: 'Gmail Account 32', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 33, email: 'anvi@grynowinfluence.shop', provider: 'Gmail Account 33', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 34, email: 'charvi@grynowinfluence.shop',provider: 'Gmail Account 34',connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 35, email: 'ira@grynowinfluence.shop',  provider: 'Gmail Account 35', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 36, email: 'myra@grynowinfluence.shop', provider: 'Gmail Account 36', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 37, email: 'kavya@grynowinfluence.shop',provider: 'Gmail Account 37', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 38, email: 'tanvi@grynowinfluence.shop',provider: 'Gmail Account 38', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 39, email: 'riya@grynowinfluence.shop', provider: 'Gmail Account 39', connected: true, sentCount: 0, maxSends: 40, active: false },
-    { id: 40, email: 'saanvi@grynowinfluence.shop',provider: 'Gmail Account 40',connected: true, sentCount: 0, maxSends: 40, active: false }
+        function initializeUploadZone() {
+            const uploadZone = document.getElementById('uploadZone');
+            const csvInput = document.getElementById('csvInput');
+            
+            if (!uploadZone || !csvInput) {
+                console.error('Upload elements not found');
+                return;
+            }
+            
+            uploadZone.addEventListener('click', function(e) {
+                e.preventDefault();
+                csvInput.click();
+            });
+            
+            uploadZone.addEventListener('dragover', handleDragOver);
+            uploadZone.addEventListener('dragleave', handleDragLeave);
+            uploadZone.addEventListener('drop', handleDrop);
+            csvInput.addEventListener('change', handleFileSelect);
+            
+            log('Upload zone initialized successfully', 'info');
+        }
 
-    ]; renderEmailAccounts(); }
-    function renderEmailAccounts(){ const c=document.getElementById('emailAccounts'); c.innerHTML='';
-      const selector=document.createElement('div'); selector.className='account-selector'; selector.innerHTML=`
-        <div class="selector-title">📧 Account Selection & Auto-Rotation</div>
-        <div class="selector-buttons">
-          ${state.emailAccounts.map(a=>`<button class="btn btn-small ${a.active?'btn-success':'btn-secondary'}" onclick="setActiveAccount(${a.id})" style="font-size:12px;">${a.active?'🟢':'⚪'} Account ${a.id}</button>`).join('')}
-        </div>
-        <div class="active-info"><strong>🎯 Primary Account:</strong> ${state.emailAccounts.find(a=>a.active)?.email || 'None'}<br>
-        <strong>🔄 Auto-Rotation:</strong> Every 40 emails per account<br><strong>⚡ Total Capacity:</strong> ${state.emailAccounts.length*40} emails/hour</div>`;
-      c.appendChild(selector);
-      state.emailAccounts.forEach(a=>{ const d=document.createElement('div'); d.className=`email-account ${a.connected?'connected':'disconnected'} ${a.active?'active-account':''}`;
-        d.innerHTML=`<div class="account-header"><div><div class="account-email">${a.active?'🟢':'⚪'} ${a.email}</div><div class="account-provider">${a.provider}</div></div>
-        <div class="status-badge ${a.connected?'status-connected':'status-disconnected'}">${a.connected?'✅ Connected':'❌ Not Connected'}</div></div>
-        <div class="account-actions"><button class="btn btn-small ${a.active?'btn-success':'btn-secondary'}" onclick="setActiveAccount(${a.id})">${a.active?'🟢 Primary':'⚪ Set Primary'}</button>
-        <button class="btn btn-small ${a.connected?'btn-danger':'btn-success'}" onclick="toggleConnection(${a.id})">${a.connected?'Disconnect':'Connect'}</button></div>
-        <div style="margin-top:10px;font-size:12px;color:#666;">📊 Sent: ${a.sentCount}/${a.maxSends} | 🕒 Limit: ${a.maxSends}/hour</div>`;
-        c.appendChild(d); });
-    }
-    function setActiveAccount(id){ state.emailAccounts.forEach(a=>a.active=false); const s=state.emailAccounts.find(a=>a.id===id); if(s) s.active=true; renderEmailAccounts(); }
-    function toggleConnection(id){ const a=state.emailAccounts.find(x=>x.id===id); if(a){ a.connected=!a.connected; renderEmailAccounts(); } }
-    async function startCampaign(){
-      if(state.contacts.length===0) return log('Please upload contacts first','error');
-      const active=state.emailAccounts.find(a=>a.active); if(!active) return log('Select a primary account','error');
-      const subject=document.getElementById('subjectLine').value; const content=getEditorHTML(); if(!subject||!content) return log('Fill subject and content','error');
-      const res=await emailAPI.sendBulkEmails({contacts:state.contacts, template:{subject,content}, selectedAccount:active.id, campaignId:`c_${Date.now()}`});
-      if(res.success){ state.stats.totalSent=res.results.sent; state.stats.failed=res.results.failed; state.stats.successRate=res.results.successRate; updateStats(); document.getElementById('progressFill').style.width='100%'; log('✅ Campaign completed','success'); }
-    }
-    async function sendTestEmail(){ const test=prompt('Enter test email address:'); if(!test) return; const active=state.emailAccounts.find(a=>a.active); if(!active) return log('No active account','error');
-      const subject=document.getElementById('subjectLine').value||'Test Email'; const content=getEditorHTML()||'This is a test email.';
-      const r=await emailAPI.sendEmail({to:test,subject,content,fromAccount:active,isHtml:true}); if(r.success) log(`✅ Test email sent to ${test}`,'success'); }
-    function previewEmail(){ if(state.contacts.length===0) return log('Please upload contacts to preview','error');
-      const sub=document.getElementById('subjectLine').value; const html=getEditorHTML(); const sample=state.contacts[0];
-      const w=window.open('','_blank','width=700,height=600'); w.document.write(`<!DOCTYPE html><html><head><title>Email Preview</title><style>body{font-family:Arial,sans-serif;padding:20px;background:#f8f9fa} .preview-header{background:#fff;padding:15px;border-radius:8px;margin-bottom:20px;border:1px solid #ddd} .preview-content{background:#fff;padding:20px;border:1px solid #ddd;border-radius:8px}</style></head><body><div class="preview-header"><div><strong>Subject:</strong> ${sub}</div><div>To: ${getContactEmail(sample)}</div></div><div class="preview-content">${html}</div></body></html>`); }
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
 
-    // ===== Misc =====
-    function updateStats(){ document.getElementById('totalSent').textContent=state.stats.totalSent; document.getElementById('successRate').textContent=state.stats.successRate+'%'; document.getElementById('inQueue').textContent=state.stats.inQueue; document.getElementById('failedCount').textContent=state.stats.failed; }
-    function downloadSampleCSV(){ const sample=`firstName,lastName,email
-John,Doe,john@example.com
-Jane,Smith,jane@example.com`; const blob=new Blob([sample],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='sample_contacts.csv'; a.click(); URL.revokeObjectURL(url); }
-    function log(msg,type='info'){ const area=document.getElementById('logArea'); const ts=new Date().toLocaleTimeString(); const d=document.createElement('div'); d.className=`log-entry log-${type}`; d.textContent=`[${ts}] ${msg}`; area.appendChild(d); area.scrollTop=area.scrollHeight; }
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('dragover');
+        }
 
-  </script>
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                processFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                processFile(file);
+            }
+        }
+
+        function processFile(file) {
+            if (!file) {
+                log('No file selected', 'error');
+                return;
+            }
+
+            log(`Processing file: ${file.name} (${formatFileSize(file.size)})`, 'info');
+
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                log('Please select a CSV file', 'error');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                log('File is too large. Maximum size is 10MB', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const csvData = e.target.result;
+                    log('File read successfully, parsing CSV...', 'info');
+                    parseCSV(csvData);
+                } catch (error) {
+                    log(`Error processing file: ${error.message}`, 'error');
+                }
+            };
+            
+            reader.onerror = function() {
+                log('Error reading file. Please try again.', 'error');
+            };
+            
+            reader.readAsText(file);
+        }
+
+        function parseCSV(csvData) {
+            try {
+                const lines = csvData.split('\\n').filter(line => line.trim() !== '');
+                
+                if (lines.length < 2) {
+                    log('CSV file must have at least a header row and one data row', 'error');
+                    return;
+                }
+                
+                const headers = parseCSVLine(lines[0]);
+                log(`Headers detected: ${headers.join(', ')}`, 'info');
+                
+                state.contacts = [];
+                
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (line) {
+                        const values = parseCSVLine(line);
+                        const contact = {};
+                        
+                        headers.forEach((header, index) => {
+                            contact[header] = values[index] || '';
+                        });
+                        
+                        const hasEmail = contact.email || contact.Email || contact.EMAIL;
+                        const hasName = contact.firstName || contact.lastName || contact.name || contact.Name;
+                        
+                        if (hasEmail || hasName) {
+                            state.contacts.push(contact);
+                        }
+                    }
+                }
+
+                if (state.contacts.length === 0) {
+                    log('No valid contacts found in CSV file', 'error');
+                    return;
+                }
+
+                displayContacts();
+                updateMergeFields(headers);
+                updateStats();
+                log(`✅ Successfully loaded ${state.contacts.length} contacts`, 'success');
+                
+            } catch (error) {
+                log(`Error parsing CSV: ${error.message}`, 'error');
+            }
+        }
+
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            let i = 0;
+            
+            while (i < line.length) {
+                const char = line[i];
+                const nextChar = line[i + 1];
+                
+                if (char === '"') {
+                    if (inQuotes && nextChar === '"') {
+                        current += '"';
+                        i += 2;
+                        continue;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+                i++;
+            }
+            
+            result.push(current.trim());
+            return result.map(field => field.replace(/^"(.*)"$/, '$1').trim());
+        }
+
+        function displayContacts() {
+            const preview = document.getElementById('contactsPreview');
+            const list = document.getElementById('contactsList');
+            
+            preview.style.display = 'block';
+            list.innerHTML = '';
+            
+            if (state.contacts.length === 0) {
+                list.innerHTML = '<div class="contact-item"><span class="contact-name">No contacts loaded</span></div>';
+                return;
+            }
+            
+            const contactsToShow = state.contacts.slice(0, 10);
+            contactsToShow.forEach((contact, index) => {
+                const item = document.createElement('div');
+                item.className = 'contact-item';
+                
+                const name = getContactName(contact);
+                const email = getContactEmail(contact);
+                const company = contact.company || contact.Company || contact.organization || '';
+                
+                item.innerHTML = `
+                    <div>
+                        <div class="contact-name">${name}</div>
+                        <div class="contact-email">${email}${company ? ` (${company})` : ''}</div>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+
+            if (state.contacts.length > 10) {
+                const moreItem = document.createElement('div');
+                moreItem.className = 'contact-item';
+                moreItem.innerHTML = `<span class="contact-name">...and ${state.contacts.length - 10} more contacts</span>`;
+                list.appendChild(moreItem);
+            }
+        }
+
+        function getContactName(contact) {
+            const firstName = contact.firstName || contact.first_name || contact['First Name'] || contact.fname || '';
+            const lastName = contact.lastName || contact.last_name || contact['Last Name'] || contact.lname || '';
+            const fullName = contact.name || contact.Name || contact.fullName || contact.full_name || '';
+            
+            if (firstName || lastName) {
+                return `${firstName} ${lastName}`.trim();
+            }
+            if (fullName) {
+                return fullName;
+            }
+            
+            const email = getContactEmail(contact);
+            if (email) {
+                return email.split('@')[0];
+            }
+            
+            return `Contact ${Math.floor(Math.random() * 1000)}`;
+        }
+
+        function getContactEmail(contact) {
+            return contact.email || 
+                   contact.Email || 
+                   contact.EMAIL || 
+                   contact['Email Address'] || 
+                   contact.email_address || 
+                   contact.mail || 
+                   contact.Mail || 
+                   '';
+        }
+
+        function updateMergeFields(headers) {
+            const container = document.getElementById('mergeFields');
+            container.innerHTML = '';
+            
+            if (!headers || headers.length === 0) {
+                return;
+            }
+            
+            headers.forEach(header => {
+                const field = document.createElement('button');
+                field.className = 'merge-field';
+                field.textContent = `{{${header}}}`;
+                field.addEventListener('click', () => insertMergeField(`{{${header}}}`));
+                container.appendChild(field);
+            });
+        }
+
+        // Insert merge field into rich editor at caret
+        function insertMergeField(field){
+            insertAtCaret(field);
+        }
+
+        // --- Rich editor helpers ---
+        function fmt(cmd){ document.execCommand(cmd, false, null); }
+        function applyHeading(tag){
+          if(tag === 'P'){ document.execCommand('formatBlock', false, 'P'); }
+          else if(tag === 'H2'){ document.execCommand('formatBlock', false, 'H2'); }
+          else if(tag === 'H3'){ document.execCommand('formatBlock', false, 'H3'); }
+          document.getElementById('emailEditor').focus();
+        }
+
+        function makeLink(){
+          const url = prompt('Enter URL (https://...)');
+          if(!url) return;
+          const sel = window.getSelection();
+          if(sel && sel.isCollapsed){
+            document.execCommand('insertText', false, url);
+            selectLastInserted(url);
+          }
+          document.execCommand('createLink', false, url);
+        }
+        function unlink(){ document.execCommand('unlink', false, null); }
+        function clearFormat(){
+          document.execCommand('removeFormat', false, null);
+          document.execCommand('unlink', false, null);
+        }
+        function selectLastInserted(text){
+          const editor = document.getElementById('emailEditor');
+          const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null, false);
+          let lastNode = null, found = null;
+          while((lastNode = walker.nextNode())){
+            const idx = lastNode.nodeValue.lastIndexOf(text);
+            if(idx !== -1){ found = {node:lastNode, idx}; }
+          }
+          if(found){
+            const r = document.createRange();
+            r.setStart(found.node, found.idx);
+            r.setEnd(found.node, found.idx + text.length);
+            const sel = window.getSelection();
+            sel.removeAllRanges(); sel.addRange(r);
+          }
+        }
+        function getEditorHTML(){ return document.getElementById('emailEditor').innerHTML; }
+        function setEditorHTML(html){ document.getElementById('emailEditor').innerHTML = html || ''; }
+        function insertAtCaret(html){
+          const editor = document.getElementById('emailEditor');
+          editor.focus();
+          const sel = window.getSelection();
+          if(!sel || sel.rangeCount === 0){ return; }
+          const range = sel.getRangeAt(0);
+          range.deleteContents();
+          const temp = document.createElement('span');
+          temp.innerHTML = html;
+          const frag = document.createDocumentFragment();
+          let node, lastNode;
+          while((node = temp.firstChild)){ lastNode = frag.appendChild(node); }
+          range.insertNode(frag);
+          if(lastNode){
+            range.setStartAfter(lastNode);
+            range.collapse(true);
+            sel.removeAllRanges(); sel.addRange(range);
+          }
+        }
+
+        function loadDemoAccounts() {
+            state.emailAccounts = [
+                {
+                    id: 1,
+                    email: 'aprajita@vidzy.in',
+                    provider: 'Gmail Account 1',
+                    connected: true,
+                    sentCount: 0,
+                    maxSends: 40,
+                    active: true
+                },
+                {
+                    id: 2,
+                    email: 'aman@vidzy.in',
+                    provider: 'Gmail Account 2',
+                    connected: true,
+                    sentCount: 0,
+                    maxSends: 40,
+                    active: false
+                },
+                {
+                    id: 3,
+                    email: 'khushigupta@vidzy.in',
+                    provider: 'Gmail Account 3',
+                    connected: true,
+                    sentCount: 0,
+                    maxSends: 40,
+                    active: false
+                },
+                {
+                    id: 4,
+                    email: 'vasu@vidzy.in',
+                    provider: 'Gmail Account 4',
+                    connected: true,
+                    sentCount: 0,
+                    maxSends: 40,
+                    active: false
+                },
+                {
+                    id: 5,
+                    email: 'arshad@vidzy.in',
+                    provider: 'Gmail Account 5',
+                    connected: true,
+                    sentCount: 0,
+                    maxSends: 40,
+                    active: false
+                },
+                {
+                    id: 6,
+                    email: 'mayank@vidzy.in',
+                    provider: 'Gmail Account 6',
+                    connected: true,
+                    sentCount: 0,
+                    maxSends: 40,
+                    active: false 
+                },
+                {
+                    id: 7,
+                    email: 'vibhanshu@vidzy.in',
+                    provider: 'Gmail Account 7',
+                    connected: true,
+                    sentCount: 0,
+                    maxSends: 40,
+                    active: false   
+                },
+                { id: 8, email: 'diya@mywallbrands.shop', provider: 'Gmail Account 8', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 9, email: 'ananya@mywallsocial.shop', provider: 'Gmail Account 9', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 10, email: 'riya@mywallsocial.shop', provider: 'Gmail Account 10', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 11, email: 'ishita@mywallsocial.shop', provider: 'Gmail Account 11', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 12, email: 'saanvi@mywallsocial.shop', provider: 'Gmail Account 12', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 13, email: 'tanvi@mywallsocial.shop', provider: 'Gmail Account 13', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 14, email: 'kavya@mywallsocial.shop', provider: 'Gmail Account 14', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 15, email: 'myra@mywallsocial.shop', provider: 'Gmail Account 15', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 16, email: 'ira@mywallsocial.shop', provider: 'Gmail Account 16', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 17, email: 'charvi@mywallsocial.shop', provider: 'Gmail Account 17', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 18, email: 'diya@mywallbrands.shop', provider: 'Gmail Account 18', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 19, email: 'ananya@mywallbrands.shop', provider: 'Gmail Account 19', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 20, email: 'riya@mywallbrands.shop', provider: 'Gmail Account 20', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 21, email: 'ishita@mywallbrands.shop', provider: 'Gmail Account 21', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 22, email: 'saanvi@mywallbrands.shop', provider: 'Gmail Account 22', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 23, email: 'tanvi@mywallbrands.shop', provider: 'Gmail Account 23', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 24, email: 'kavya@mywallbrands.shop', provider: 'Gmail Account 24', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 25, email: 'myra@mywallbrands.shop', provider: 'Gmail Account 25', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 26, email: 'ira@mywallbrands.shop', provider: 'Gmail Account 26', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 27, email: 'charvi@mywallbrands.shop', provider: 'Gmail Account 27', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 28, email: 'diya@mywallstudio.shop', provider: 'Gmail Account 28', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 29, email: 'ananya@mywallstudio.shop', provider: 'Gmail Account 29', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 30, email: 'riya@mywallstudio.shop', provider: 'Gmail Account 30', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 31, email: 'ira@mywallstudio.shop', provider: 'Gmail Account 31', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 32, email: 'charvi@mywallstudio.shop', provider: 'Gmail Account 32', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 33, email: 'anvi@grynowinfluence.shop', provider: 'Gmail Account 33', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 34, email: 'charvi@grynowinfluence.shop', provider: 'Gmail Account 34', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 35, email: 'ira@grynowinfluence.shop', provider: 'Gmail Account 35', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 36, email: 'myra@grynowinfluence.shop', provider: 'Gmail Account 36', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 37, email: 'kavya@grynowinfluence.shop', provider: 'Gmail Account 37', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 38, email: 'tanvi@grynowinfluence.shop', provider: 'Gmail Account 38', connected: true, sentCount: 0, maxSends: 40, active: false }, { id: 39, email: 'riya@grynowinfluence.shop', provider: 'Gmail Account 39', connected: true, sentCount: 0, maxSends: 40, active: false },
+                { id: 40, email: 'saanvi@grynowinfluence.shop', provider: 'Gmail Account 40', connected: true, sentCount: 0, maxSends: 40, active: false }
+            ];
+            renderEmailAccounts();
+        }
+
+        function renderEmailAccounts() {
+            const container = document.getElementById('emailAccounts');
+            container.innerHTML = '';
+            
+            // Add account selector
+            const selectorDiv = document.createElement('div');
+            selectorDiv.className = 'account-selector';
+            selectorDiv.innerHTML = `
+                <div class="selector-title">📧 Account Selection & Auto-Rotation</div>
+                <div class="selector-buttons">
+                    ${state.emailAccounts.map(account => `
+                        <button class="btn btn-small ${account.active ? 'btn-success' : 'btn-secondary'}" 
+                                onclick="setActiveAccount(${account.id})"
+                                style="font-size: 12px;">
+                            ${account.active ? '🟢' : '⚪'} Account ${account.id}
+                        </button>
+                    `).join('')}
+                </div>
+                <div class="active-info">
+                    <strong>🎯 Primary Account:</strong> ${state.emailAccounts.find(a => a.active)?.email || 'None'}<br>
+                    <strong>🔄 Auto-Rotation:</strong> Every 40 emails per account<br>
+                    <strong>⚡ Total Capacity:</strong> ${state.emailAccounts.length * 40} emails/hour
+                </div>
+            `;
+            container.appendChild(selectorDiv);
+            
+            // Add individual account cards
+            state.emailAccounts.forEach(account => {
+                const accountDiv = document.createElement('div');
+                accountDiv.className = `email-account ${account.connected ? 'connected' : 'disconnected'} ${account.active ? 'active-account' : ''}`;
+                accountDiv.innerHTML = `
+                    <div class="account-header">
+                        <div>
+                            <div class="account-email">
+                                ${account.active ? '🟢' : '⚪'} ${account.email}
+                            </div>
+                            <div class="account-provider">${account.provider}</div>
+                        </div>
+                        <div class="status-badge ${account.connected ? 'status-connected' : 'status-disconnected'}">
+                            ${account.connected ? '✅ Connected' : '❌ Not Connected'}
+                        </div>
+                    </div>
+                    <div class="account-actions">
+                        <button class="btn btn-small ${account.active ? 'btn-success' : 'btn-secondary'}" 
+                                onclick="setActiveAccount(${account.id})">
+                            ${account.active ? '🟢 Primary' : '⚪ Set Primary'}
+                        </button>
+                        <button class="btn btn-small ${account.connected ? 'btn-danger' : 'btn-success'}" 
+                                onclick="toggleConnection(${account.id})">
+                            ${account.connected ? 'Disconnect' : 'Connect'}
+                        </button>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                        📊 Sent: ${account.sentCount}/${account.maxSends} | 🕒 Limit: ${account.maxSends}/hour
+                    </div>
+                `;
+                container.appendChild(accountDiv);
+            });
+        }
+
+        function setActiveAccount(accountId) {
+            state.emailAccounts.forEach(account => {
+                account.active = false;
+            });
+            
+            const selectedAccount = state.emailAccounts.find(a => a.id === accountId);
+            if (selectedAccount) {
+                selectedAccount.active = true;
+                log(`🎯 Primary account set to: ${selectedAccount.email}`, 'info');
+            }
+            
+            renderEmailAccounts();
+        }
+
+        function toggleConnection(accountId) {
+            const account = state.emailAccounts.find(a => a.id === accountId);
+            if (account) {
+                account.connected = !account.connected;
+                renderEmailAccounts();
+                log(`${account.email} ${account.connected ? 'connected' : 'disconnected'}`, 'info');
+            }
+        }
+
+        async function startCampaign() {
+            if (state.contacts.length === 0) {
+                log('Please upload contacts first', 'error');
+                return;
+            }
+            
+            const activeAccount = state.emailAccounts.find(a => a.active);
+            if (!activeAccount) {
+                log('Please select a primary email account', 'error');
+                return;
+            }
+            
+            const campaignName = document.getElementById('campaignName').value || 'Untitled Campaign';
+            const subject = document.getElementById('subjectLine').value;
+            const content = getEditorHTML();
+            
+            if (!subject || !content) {
+                log('Please fill in subject and content', 'error');
+                return;
+            }
+            
+            try {
+                log(`🚀 Starting campaign: ${campaignName}`, 'info');
+                log(`🎯 Primary account: ${activeAccount.email}`, 'info');
+                log(`📊 Total contacts: ${state.contacts.length}`, 'info');
+                log(`🔄 Auto-rotation: Every 40 emails across ${state.emailAccounts.length} accounts`, 'info');
+                document.getElementById('startCampaign').disabled = true;
+                
+                const bulkData = {
+                    contacts: state.contacts,
+                    template: {
+                        subject: subject,
+                        content: content
+                    },
+                    selectedAccount: activeAccount.id,
+                    campaignId: `campaign_${Date.now()}`,
+                    batchSize: 5,
+                    delayBetweenBatches: 2000
+                };
+
+                const result = await emailAPI.sendBulkEmails(bulkData);
+                
+                if (result.success) {
+                    log(`✅ Campaign completed!`, 'success');
+                    log(`🎯 Primary account: ${result.results.usedAccount}`, 'info');
+                    log(`📊 Results: ${result.results.sent} sent, ${result.results.failed} failed`, 'info');
+                    
+                    if (result.results.accountSwitches && result.results.accountSwitches.length > 0) {
+                        log(`🔄 Account switches: ${result.results.accountSwitches.length}`, 'info');
+                        result.results.accountSwitches.forEach((switchInfo, index) => {
+                            log(`   📧 Switch ${index + 1}: ${switchInfo.newAccount} (after email ${switchInfo.switchAt})`, 'info');
+                        });
+                    }
+                    
+                    state.stats.totalSent = result.results.sent;
+                    state.stats.failed = result.results.failed;
+                    state.stats.successRate = result.results.successRate;
+                    state.stats.inQueue = 0;
+                    updateStats();
+                    
+                    document.getElementById('progressFill').style.width = '100%';
+                    
+                    if (result.results.errors.length > 0) {
+                        log(`❌ Failed emails: ${result.results.errors.length}`, 'error');
+                        result.results.errors.slice(0, 5).forEach(error => {
+                            log(`   • ${error.email}: ${error.error}`, 'error');
+                        });
+                        if (result.results.errors.length > 5) {
+                            log(`   ... and ${result.results.errors.length - 5} more errors`, 'error');
+                        }
+                    }
+                }
+
+            } catch (error) {
+                log(`❌ Campaign failed: ${error.message}`, 'error');
+            } finally {
+                document.getElementById('startCampaign').disabled = false;
+            }
+        }
+
+        async function sendTestEmail() {
+            const testEmail = prompt('Enter test email address:');
+            if (!testEmail) return;
+            
+            const activeAccount = state.emailAccounts.find(a => a.active);
+            if (!activeAccount) {
+                log('No active email account available', 'error');
+                return;
+            }
+            
+            const subject = document.getElementById('subjectLine').value || 'Test Email';
+            const content = getEditorHTML() || 'This is a test email from Email Marketing Pro.';
+            
+            try {
+                log(`📧 Sending test email to ${testEmail}...`, 'info');
+                
+                const result = await emailAPI.sendEmail({
+                    to: testEmail,
+                    subject: subject,
+                    content: content,
+                    fromAccount: activeAccount,
+                    isHtml: true
+                });
+
+                if (result.success) {
+                    log(`✅ Test email sent successfully to ${testEmail}`, 'success');
+                    log(`📧 Message ID: ${result.messageId}`, 'info');
+                }
+
+            } catch (error) {
+                log(`❌ Test email failed: ${error.message}`, 'error');
+            }
+        }
+
+        function previewEmail() {
+            const subject = document.getElementById('subjectLine').value;
+            const contentHTML = getEditorHTML();
+            
+            if (state.contacts.length === 0) {
+                log('Please upload contacts to preview email', 'error');
+                return;
+            }
+            
+            const sampleContact = state.contacts[0];
+            const previewSubject = personalizeTemplate(subject, sampleContact);
+            const previewContent = personalizeTemplate(contentHTML, sampleContact);
+            
+            const previewWindow = window.open('', '_blank', 'width=700,height=600');
+            previewWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Email Preview</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; background:#f8f9fa }
+                        .preview-header { background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border:1px solid #ddd; }
+                        .preview-subject { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+                        .preview-content { background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="preview-header">
+                        <div class="preview-subject">Subject: ${previewSubject}</div>
+                        <div>To: ${getContactEmail(sampleContact)}</div>
+                    </div>
+                    <div class="preview-content">${previewContent}</div>
+                </body>
+                </html>
+            `);
+            
+            log('📧 Email preview opened', 'info');
+        }
+
+        function saveTemplate() {
+            const templateName = document.getElementById('templateName').value || 'Untitled Template';
+            const template = {
+                name: templateName,
+                subject: document.getElementById('subjectLine').value,
+                content: getEditorHTML(),
+                timestamp: new Date().toISOString()
+            };
+            
+            try {
+                localStorage.setItem(`template_${Date.now()}`, JSON.stringify(template));
+                log(`💾 Template "${templateName}" saved successfully`, 'success');
+            } catch (error) {
+                log(`❌ Failed to save template: ${error.message}`, 'error');
+            }
+        }
+
+        function downloadSampleCSV() {
+            const sampleData = `firstName,lastName,email,company,phone,position
+John,Doe,john.doe@example.com,Acme Corp,555-0123,Marketing Manager
+Jane,Smith,jane.smith@example.com,Tech Solutions,555-0456,Sales Director
+Bob,Johnson,bob.johnson@example.com,Digital Agency,555-0789,CEO
+Alice,Brown,alice.brown@example.com,StartupCo,555-0321,Product Manager
+Mike,Wilson,mike.wilson@example.com,Innovation Labs,555-0654,Developer
+Sarah,Davis,sarah.davis@example.com,Creative Studio,555-0987,Designer
+Tom,Miller,tom.miller@example.com,Consulting Group,555-0246,Consultant
+Lisa,Garcia,lisa.garcia@example.com,E-commerce Plus,555-0135,Marketing Lead`;
+
+            const blob = new Blob([sampleData], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'sample_contacts.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            log('📥 Sample CSV downloaded', 'success');
+        }
+
+        function personalizeTemplate(template, contact) {
+            if (!template || typeof template !== 'string') {
+                return template;
+            }
+            
+            let personalized = template;
+            Object.keys(contact).forEach(key => {
+                const regex = new RegExp(`{{${key}}}`, 'g');
+                personalized = personalized.replace(regex, contact[key] || '');
+            });
+            
+            personalized = personalized.replace(/{{[^}]*}}/g, '');
+            
+            return personalized;
+        }
+
+        function updateStats() {
+            document.getElementById('totalSent').textContent = state.stats.totalSent;
+            document.getElementById('successRate').textContent = state.stats.successRate + '%';
+            document.getElementById('inQueue').textContent = state.stats.inQueue;
+            document.getElementById('failedCount').textContent = state.stats.failed;
+        }
+
+        function log(message, type = 'info') {
+            const logArea = document.getElementById('logArea');
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${timestamp}] ${message}`;
+            logArea.appendChild(entry);
+            logArea.scrollTop = logArea.scrollHeight;
+            
+            const entries = logArea.querySelectorAll('.log-entry');
+            if (entries.length > 100) {
+                entries[0].remove();
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Make functions globally available
+        window.setActiveAccount = setActiveAccount;
+        window.toggleConnection = toggleConnection;
+    </script>
 </body>
 </html>
