@@ -555,19 +555,19 @@
                 gap: 20px;
                 padding: 20px;
             }
-            
+
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-            
+
             .header h1 {
                 font-size: 2em;
             }
-            
+
             .section {
                 padding: 20px;
             }
-            
+
             .selector-buttons {
                 justify-content: center;
             }
@@ -708,7 +708,7 @@
                         <div class="section-title">Email Accounts (Multiple Account System)</div>
                     </div>
                     <div class="email-accounts" id="emailAccounts"></div>
-                    
+
                     <div class="action-buttons">
                         <button class="btn btn-small" id="previewBtn">👁️ Preview</button>
                         <button class="btn btn-small" id="testBtn">🧪 Test Send</button>
@@ -762,7 +762,7 @@
                     });
 
                     const result = await response.json();
-                    
+
                     if (!response.ok) {
                         throw new Error(result.error || 'Failed to send email');
                     }
@@ -785,7 +785,7 @@
                     });
 
                     const result = await response.json();
-                    
+
                     if (!response.ok) {
                         throw new Error(result.error || 'Failed to send bulk emails');
                     }
@@ -816,7 +816,7 @@
         function setupEventListeners() {
             // Initialize upload zone
             initializeUploadZone();
-            
+
             // Other event listeners
             document.getElementById('startCampaign').addEventListener('click', startCampaign);
             document.getElementById('previewBtn').addEventListener('click', previewEmail);
@@ -833,22 +833,22 @@
         function initializeUploadZone() {
             const uploadZone = document.getElementById('uploadZone');
             const csvInput = document.getElementById('csvInput');
-            
+
             if (!uploadZone || !csvInput) {
                 console.error('Upload elements not found');
                 return;
             }
-            
+
             uploadZone.addEventListener('click', function(e) {
                 e.preventDefault();
                 csvInput.click();
             });
-            
+
             uploadZone.addEventListener('dragover', handleDragOver);
             uploadZone.addEventListener('dragleave', handleDragLeave);
             uploadZone.addEventListener('drop', handleDrop);
             csvInput.addEventListener('change', handleFileSelect);
-            
+
             log('Upload zone initialized successfully', 'info');
         }
 
@@ -896,7 +896,7 @@
             }
 
             const reader = new FileReader();
-            
+
             reader.onload = function(e) {
                 try {
                     const csvData = e.target.result;
@@ -906,41 +906,41 @@
                     log(`Error processing file: ${error.message}`, 'error');
                 }
             };
-            
+
             reader.onerror = function() {
                 log('Error reading file. Please try again.', 'error');
             };
-            
+
             reader.readAsText(file);
         }
 
         function parseCSV(csvData) {
             try {
-                const lines = csvData.split('\\n').filter(line => line.trim() !== '');
-                
+                const lines = csvData.split('\n').filter(line => line.trim() !== '');
+
                 if (lines.length < 2) {
                     log('CSV file must have at least a header row and one data row', 'error');
                     return;
                 }
-                
+
                 const headers = parseCSVLine(lines[0]);
                 log(`Headers detected: ${headers.join(', ')}`, 'info');
-                
+
                 state.contacts = [];
-                
+
                 for (let i = 1; i < lines.length; i++) {
                     const line = lines[i].trim();
                     if (line) {
                         const values = parseCSVLine(line);
                         const contact = {};
-                        
+
                         headers.forEach((header, index) => {
                             contact[header] = values[index] || '';
                         });
-                        
+
                         const hasEmail = contact.email || contact.Email || contact.EMAIL;
                         const hasName = contact.firstName || contact.lastName || contact.name || contact.Name;
-                        
+
                         if (hasEmail || hasName) {
                             state.contacts.push(contact);
                         }
@@ -956,7 +956,7 @@
                 updateMergeFields(headers);
                 updateStats();
                 log(`✅ Successfully loaded ${state.contacts.length} contacts`, 'success');
-                
+
             } catch (error) {
                 log(`Error parsing CSV: ${error.message}`, 'error');
             }
@@ -967,11 +967,11 @@
             let current = '';
             let inQuotes = false;
             let i = 0;
-            
+
             while (i < line.length) {
                 const char = line[i];
                 const nextChar = line[i + 1];
-                
+
                 if (char === '"') {
                     if (inQuotes && nextChar === '"') {
                         current += '"';
@@ -988,7 +988,7 @@
                 }
                 i++;
             }
-            
+
             result.push(current.trim());
             return result.map(field => field.replace(/^"(.*)"$/, '$1').trim());
         }
@@ -996,24 +996,24 @@
         function displayContacts() {
             const preview = document.getElementById('contactsPreview');
             const list = document.getElementById('contactsList');
-            
+
             preview.style.display = 'block';
             list.innerHTML = '';
-            
+
             if (state.contacts.length === 0) {
                 list.innerHTML = '<div class="contact-item"><span class="contact-name">No contacts loaded</span></div>';
                 return;
             }
-            
+
             const contactsToShow = state.contacts.slice(0, 10);
             contactsToShow.forEach((contact, index) => {
                 const item = document.createElement('div');
                 item.className = 'contact-item';
-                
+
                 const name = getContactName(contact);
                 const email = getContactEmail(contact);
                 const company = contact.company || contact.Company || contact.organization || '';
-                
+
                 item.innerHTML = `
                     <div>
                         <div class="contact-name">${name}</div>
@@ -1035,19 +1035,19 @@
             const firstName = contact.firstName || contact.first_name || contact['First Name'] || contact.fname || '';
             const lastName = contact.lastName || contact.last_name || contact['Last Name'] || contact.lname || '';
             const fullName = contact.name || contact.Name || contact.fullName || contact.full_name || '';
-            
+
             if (firstName || lastName) {
                 return `${firstName} ${lastName}`.trim();
             }
             if (fullName) {
                 return fullName;
             }
-            
+
             const email = getContactEmail(contact);
             if (email) {
                 return email.split('@')[0];
             }
-            
+
             return `Contact ${Math.floor(Math.random() * 1000)}`;
         }
 
@@ -1065,11 +1065,11 @@
         function updateMergeFields(headers) {
             const container = document.getElementById('mergeFields');
             container.innerHTML = '';
-            
+
             if (!headers || headers.length === 0) {
                 return;
             }
-            
+
             headers.forEach(header => {
                 const field = document.createElement('button');
                 field.className = 'merge-field';
@@ -1084,7 +1084,7 @@
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
             const text = textarea.value;
-            
+
             textarea.value = text.substring(0, start) + field + text.substring(end);
             textarea.setSelectionRange(start + field.length, start + field.length);
             textarea.focus();
@@ -1453,8 +1453,8 @@
   active: false
 }
 
-     
-                  
+
+
             ];
             renderEmailAccounts();
         }
@@ -1462,7 +1462,7 @@
         function renderEmailAccounts() {
             const container = document.getElementById('emailAccounts');
             container.innerHTML = '';
-            
+
             // Add account selector
             const selectorDiv = document.createElement('div');
             selectorDiv.className = 'account-selector';
@@ -1484,7 +1484,7 @@
                 </div>
             `;
             container.appendChild(selectorDiv);
-            
+
             // Add individual account cards
             state.emailAccounts.forEach(account => {
                 const accountDiv = document.createElement('div');
@@ -1523,13 +1523,13 @@
             state.emailAccounts.forEach(account => {
                 account.active = false;
             });
-            
+
             const selectedAccount = state.emailAccounts.find(a => a.id === accountId);
             if (selectedAccount) {
                 selectedAccount.active = true;
                 log(`🎯 Primary account set to: ${selectedAccount.email}`, 'info');
             }
-            
+
             renderEmailAccounts();
         }
 
@@ -1547,29 +1547,29 @@
                 log('Please upload contacts first', 'error');
                 return;
             }
-            
+
             const activeAccount = state.emailAccounts.find(a => a.active);
             if (!activeAccount) {
                 log('Please select a primary email account', 'error');
                 return;
             }
-            
+
             const campaignName = document.getElementById('campaignName').value || 'Untitled Campaign';
             const subject = document.getElementById('subjectLine').value;
             const content = document.getElementById('emailContent').value;
-            
+
             if (!subject || !content) {
                 log('Please fill in subject and content', 'error');
                 return;
             }
-            
+
             try {
                 log(`🚀 Starting campaign: ${campaignName}`, 'info');
                 log(`🎯 Primary account: ${activeAccount.email}`, 'info');
                 log(`📊 Total contacts: ${state.contacts.length}`, 'info');
                 log(`🔄 Auto-rotation: Every 40 emails across ${state.emailAccounts.length} accounts`, 'info');
                 document.getElementById('startCampaign').disabled = true;
-                
+
                 const bulkData = {
                     contacts: state.contacts,
                     template: {
@@ -1583,12 +1583,12 @@
                 };
 
                 const result = await emailAPI.sendBulkEmails(bulkData);
-                
+
                 if (result.success) {
                     log(`✅ Campaign completed!`, 'success');
                     log(`🎯 Primary account: ${result.results.usedAccount}`, 'info');
                     log(`📊 Results: ${result.results.sent} sent, ${result.results.failed} failed`, 'info');
-                    
+
                     // Show account switches
                     if (result.results.accountSwitches && result.results.accountSwitches.length > 0) {
                         log(`🔄 Account switches: ${result.results.accountSwitches.length}`, 'info');
@@ -1596,17 +1596,17 @@
                             log(`   📧 Switch ${index + 1}: ${switchInfo.newAccount} (after email ${switchInfo.switchAt})`, 'info');
                         });
                     }
-                    
+
                     // Update stats
                     state.stats.totalSent = result.results.sent;
                     state.stats.failed = result.results.failed;
                     state.stats.successRate = result.results.successRate;
                     state.stats.inQueue = 0;
                     updateStats();
-                    
+
                     // Update progress bar
                     document.getElementById('progressFill').style.width = '100%';
-                    
+
                     // Show errors if any
                     if (result.results.errors.length > 0) {
                         log(`❌ Failed emails: ${result.results.errors.length}`, 'error');
@@ -1629,19 +1629,19 @@
         async function sendTestEmail() {
             const testEmail = prompt('Enter test email address:');
             if (!testEmail) return;
-            
+
             const activeAccount = state.emailAccounts.find(a => a.active);
             if (!activeAccount) {
                 log('No active email account available', 'error');
                 return;
             }
-            
+
             const subject = document.getElementById('subjectLine').value || 'Test Email';
             const content = document.getElementById('emailContent').value || 'This is a test email from Email Marketing Pro.';
-            
+
             try {
                 log(`📧 Sending test email to ${testEmail}...`, 'info');
-                
+
                 const result = await emailAPI.sendEmail({
                     to: testEmail,
                     subject: subject,
@@ -1663,16 +1663,16 @@
         function previewEmail() {
             const subject = document.getElementById('subjectLine').value;
             const content = document.getElementById('emailContent').value;
-            
+
             if (state.contacts.length === 0) {
                 log('Please upload contacts to preview email', 'error');
                 return;
             }
-            
+
             const sampleContact = state.contacts[0];
             const previewSubject = personalizeTemplate(subject, sampleContact);
             const previewContent = personalizeTemplate(content, sampleContact);
-            
+
             const previewWindow = window.open('', '_blank', 'width=700,height=500');
             previewWindow.document.write(`
                 <!DOCTYPE html>
@@ -1698,7 +1698,7 @@
                 </body>
                 </html>
             `);
-            
+
             log('📧 Email preview opened', 'info');
         }
 
@@ -1710,7 +1710,7 @@
                 content: document.getElementById('emailContent').value,
                 timestamp: new Date().toISOString()
             };
-            
+
             try {
                 localStorage.setItem(`template_${Date.now()}`, JSON.stringify(template));
                 log(`💾 Template "${templateName}" saved successfully`, 'success');
@@ -1737,7 +1737,7 @@ Lisa,Garcia,lisa.garcia@example.com,E-commerce Plus,555-0135,Marketing Lead`;
             a.download = 'sample_contacts.csv';
             a.click();
             URL.revokeObjectURL(url);
-            
+
             log('📥 Sample CSV downloaded', 'success');
         }
 
@@ -1745,15 +1745,15 @@ Lisa,Garcia,lisa.garcia@example.com,E-commerce Plus,555-0135,Marketing Lead`;
             if (!template || typeof template !== 'string') {
                 return template;
             }
-            
+
             let personalized = template;
             Object.keys(contact).forEach(key => {
                 const regex = new RegExp(`{{${key}}}`, 'g');
                 personalized = personalized.replace(regex, contact[key] || '');
             });
-            
+
             personalized = personalized.replace(/{{[^}]*}}/g, '');
-            
+
             return personalized;
         }
 
@@ -1772,7 +1772,7 @@ Lisa,Garcia,lisa.garcia@example.com,E-commerce Plus,555-0135,Marketing Lead`;
             entry.textContent = `[${timestamp}] ${message}`;
             logArea.appendChild(entry);
             logArea.scrollTop = logArea.scrollHeight;
-            
+
             const entries = logArea.querySelectorAll('.log-entry');
             if (entries.length > 100) {
                 entries[0].remove();
