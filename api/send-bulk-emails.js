@@ -274,10 +274,28 @@ module.exports = async function handler(req, res) {
   email: 'layan@grynowuae.shop',
   password: 'sigzivgtpnshevei',
   active: false
+},
+{
+id: 38,
+  name: 'Account 38',
+  email: 'aanya@mywallcreative.com',
+  password: 'htjbxpkhigrrvtkj',
+  active: false
+},
+{
+  id: 39,
+  name: 'Account 39',
+  email: 'aditi@mywallcampaigns.shop',
+  password: 'envkybxdbhdtridx',
+  active: false
+},
+{
+  id: 40,
+  name: 'Account 40',
+  email: 'aditi@mywallcrm.shop',
+  password: 'unyfknnorgskadbh',
+  active: false   
 }
-
-    
-
     ];
 
     // Select account based on frontend selection or use first active
@@ -419,6 +437,7 @@ function convertTextToHTML(text) {
     .replace(/^/, '<div style="white-space: pre-wrap; font-family: Arial, sans-serif; line-height: 1.6; color: #333;">')
     .replace(/$/, '</div>');
 }
+
 
 
 
