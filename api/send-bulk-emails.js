@@ -295,7 +295,78 @@ id: 38,
   email: 'aditi@mywallcrm.shop',
   password: 'unyfknnorgskadbh',
   active: false   
+},
+{
+  id: 41,
+  name: 'Account 41',
+  email: 'mansi@mywallcampaigns.shop',
+  password: 'exbfrpjyouqutjcs',
+  active: false
+},
+{
+  id: 42,
+  name: 'Account 42',
+  email: 'avni@mywallcampaigns.shop',
+  password: 'uzozbiizoxgyctmd',
+  active: false
+},
+{
+  id: 43,
+  name: 'Account 43',
+  email: 'bhavya@mywallcampaigns.shop',
+  password: 'vhwwdxxeuulxjisj',
+  active: false
+},
+{
+  id: 44,
+  name: 'Account 44',
+  email: 'charvi@mywallcampaigns.shop',
+  password: 'evngakeaujnmtuiy',
+  active: false
+},
+{
+  id: 45,
+  name: 'Account 45',
+  email: 'diya@mywallcampaigns.shop',
+  password: 'boyvchqorkqhkamu',
+  active: false
+},
+{
+  id: 46,
+  name: 'Account 46',
+  email: 'esha@mywallcampaigns.shop',
+  password: 'ziystrpojkxagbwb',
+  active: false
+},
+{
+  id: 47,
+  name: 'Account 47',
+  email: 'gauri@mywallcampaigns.shop',
+  password: 'asltjsizaympzmny',
+  active: false
+},
+{
+  id: 48,
+  name: 'Account 48',
+  email: 'charvimywall@mywallcampaigns.shop',
+  password: 'cpeohvyvdngctjur',
+  active: false
+},
+{
+  id: 49,
+  name: 'Account 49',
+  email: 'shreya@mywallcampaigns.shop',
+  password: 'spevwmzxspnsdvpq',
+  active: false
+},
+{
+  id: 50,
+  name: 'Account 50',
+  email: 'charvi@mywallcrm.shop',
+  password: 'jtqahazjkmozcuxo',
+  active: false
 }
+
     ];
 
     // Select account based on frontend selection or use first active
@@ -437,6 +508,7 @@ function convertTextToHTML(text) {
     .replace(/^/, '<div style="white-space: pre-wrap; font-family: Arial, sans-serif; line-height: 1.6; color: #333;">')
     .replace(/$/, '</div>');
 }
+
 
 
 
