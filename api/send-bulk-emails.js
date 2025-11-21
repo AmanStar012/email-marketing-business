@@ -64,309 +64,71 @@ module.exports = async function handler(req, res) {
         password: 'bwmigdrkpumvbcrp',
         active: false
       },
-   
- {
-  id: 8,
-  name: 'Account 8',
-  email: 'anvi@grynowinfluence.shop',
-  password: 'puxgifpfininrdez',
-  active: false
-},
-{
-  id: 9,
-  name: 'Account 9',
-  email: 'charvi@grynowinfluence.shop',
-  password: 'frvbvandhbgvfcnn',
-  active: false
-},
-{
-  id: 10,
-  name: 'Account 10',
-  email: 'ira@grynowinfluence.shop',
-  password: 'hsjxycgghxjzckcy',
-  active: false
-},
-{
-  id: 11,
-  name: 'Account 11',
-  email: 'myra@grynowinfluence.shop',
-  password: 'uomdavlywyahxqkf',
-  active: false
-},
-{
-  id: 12,
-  name: 'Account 12',
-  email: 'kavya@grynowinfluence.shop',
-  password: 'kjefdqfsaolkslts',
-  active: false
-},
-{
-  id: 13,
-  name: 'Account 13',
-  email: 'tanvi@grynowinfluence.shop',
-  password: 'nbvjfvzsxovhybko',
-  active: false
-},
-{
-  id: 14,
-  name: 'Account 14',
-  email: 'riya@grynowinfluence.shop',
-  password: 'uiaonyoctycvhcxo',
-  active: false
-},
-{
-  id: 15,
-  name: 'Account 15',
-  email: 'saanvi@grynowinfluence.shop',
-  password: 'inthxtokghhnuyww',
-  active: false
-},
-{
-  id: 16,
-  name: 'Account 16',
-  email: 'ishita@grynowinfluence.shop',
-  password: 'pyymeypghuankrna',
-  active: false
-},
-{
-  id: 17,
-  name: 'Account 17',
-  email: 'diya@grynowinfluence.shop',
-  password: 'xnkjdxhmlmfkxrzc',
-  active: false
-},
-{
-  id: 18,
-  name: 'Account 18',
-  email: 'anvi@grynowstudio.shop',
-  password: 'ouyatgtbjxvzngwx',
-  active: false
-},
-{
-  id: 19,
-  name: 'Account 19',
-  email: 'charvi@grynowstudio.shop',
-  password: 'dgcvkqbqubjqnyru',
-  active: false
-},
-{
-  id: 20,
-  name: 'Account 20',
-  email: 'ira@grynowstudio.shop',
-  password: 'ckxtpkvbpvxvtcdb',
-  active: false
-},
-{
-  id: 21,
-  name: 'Account 21',
-  email: 'myra@grynowstudio.shop',
-  password: 'iukwkvmfrihyxmuu',
-  active: false
-},
-{
-  id: 22,
-  name: 'Account 22',
-  email: 'kavya@grynowstudio.shop',
-  password: 'gkzfmyhiyzjqrrcj',
-  active: false
-},
-{
-  id: 23,
-  name: 'Account 23',
-  email: 'tanvi@grynowstudio.shop',
-  password: 'oalrnwgyicirupxi',
-  active: false
-},
-{
-  id: 24,
-  name: 'Account 24',
-  email: 'riya@grynowstudio.shop',
-  password: 'vdzuspmpjufcrsiy',
-  active: false
-},
-{
-  id: 25,
-  name: 'Account 25',
-  email: 'saanvi@grynowstudio.shop',
-  password: 'xcjvbnfrdadvhhwh',
-  active: false
-},
-{
-  id: 26,
-  name: 'Account 26',
-  email: 'ishita@grynowstudio.shop',
-  password: 'ejorvbvqapkfczmq',
-  active: false
-},
-{
-  id: 27,
-  name: 'Account 27',
-  email: 'diya@grynowstudio.shop',
-  password: 'neiekfatvmkpmlbv',
-  active: false
-},
-{
-  id: 28,
-  name: 'Account 28',
-  email: 'samreen@grynowuae.shop',
-  password: 'foyixceupnulvuku',
-  active: false
-},
-{
-  id: 29,
-  name: 'Account 29',
-  email: 'marwa@grynowuae.shop',
-  password: 'fauegbtjjdaxoxbu',
-  active: false
-},
-{
-  id: 30,
-  name: 'Account 30',
-  email: 'ira@grynowuae.shop',
-  password: 'ncujsjzsdxkqbfhx',
-  active: false
-},
-{
-  id: 31,
-  name: 'Account 31',
-  email: 'farheen@grynowuae.shop',
-  password: 'jtufppfqywbesehu',
-  active: false
-},
-{
-  id: 32,
-  name: 'Account 32',
-  email: 'maha@grynowuae.shop',
-  password: 'okhvlobdtdblwftm',
-  active: false
-},
-{
-  id: 33,
-  name: 'Account 33',
-  email: 'reem@grynowuae.shop',
-  password: 'befyoguzblusulas',
-  active: false
-},
-{
-  id: 34,
-  name: 'Account 34',
-  email: 'yasmin@grynowuae.shop',
-  password: 'vrmchproivplpojp',
-  active: false
-},
-{
-  id: 35,
-  name: 'Account 35',
-  email: 'meera@grynowuae.shop',
-  password: 'czuwenmuuqhrklmu',
-  active: false
-},
-{
-  id: 36,
-  name: 'Account 36',
-  email: 'latifa@grynowuae.shop',
-  password: 'etmobweaivoleumq',
-  active: false
-},
-{
-  id: 37,
-  name: 'Account 37',
-  email: 'layan@grynowuae.shop',
-  password: 'sigzivgtpnshevei',
-  active: false
-},
-{
-id: 38,
-  name: 'Account 38',
-  email: 'aanya@mywallcreative.com',
-  password: 'htjbxpkhigrrvtkj',
-  active: false
-},
-{
-  id: 39,
-  name: 'Account 39',
-  email: 'aditi@mywallcampaigns.shop',
-  password: 'envkybxdbhdtridx',
-  active: false
-},
-{
-  id: 40,
-  name: 'Account 40',
-  email: 'aditi@mywallcrm.shop',
-  password: 'unyfknnorgskadbh',
-  active: false   
-},
-{
-  id: 41,
-  name: 'Account 41',
-  email: 'mansi@mywallcampaigns.shop',
-  password: 'exbfrpjyouqutjcs',
-  active: false
-},
-{
-  id: 42,
-  name: 'Account 42',
-  email: 'avni@mywallcampaigns.shop',
-  password: 'uzozbiizoxgyctmd',
-  active: false
-},
-{
-  id: 43,
-  name: 'Account 43',
-  email: 'bhavya@mywallcampaigns.shop',
-  password: 'vhwwdxxeuulxjisj',
-  active: false
-},
-{
-  id: 44,
-  name: 'Account 44',
-  email: 'charvi@mywallcampaigns.shop',
-  password: 'evngakeaujnmtuiy',
-  active: false
-},
-{
-  id: 45,
-  name: 'Account 45',
-  email: 'diya@mywallcampaigns.shop',
-  password: 'boyvchqorkqhkamu',
-  active: false
-},
-{
-  id: 46,
-  name: 'Account 46',
-  email: 'esha@mywallcampaigns.shop',
-  password: 'ziystrpojkxagbwb',
-  active: false
-},
-{
-  id: 47,
-  name: 'Account 47',
-  email: 'gauri@mywallcampaigns.shop',
-  password: 'asltjsizaympzmny',
-  active: false
-},
-{
-  id: 48,
-  name: 'Account 48',
-  email: 'charvimywall@mywallcampaigns.shop',
-  password: 'cpeohvyvdngctjur',
-  active: false
-},
-{
-  id: 49,
-  name: 'Account 49',
-  email: 'shreya@mywallcampaigns.shop',
-  password: 'spevwmzxspnsdvpq',
-  active: false
-},
-{
-  id: 50,
-  name: 'Account 50',
-  email: 'charvi@mywallcrm.shop',
-  password: 'jtqahazjkmozcuxo',
-  active: false
-}
+      {
+        id: 8,
+        name: 'Account 8',
+        email: 'khushi@mywallpro.store',
+        password: 'owplhokmkpxyliqd',
+        active: false
+      },
+      {
+        id: 9,
+        name: 'Account 9',
+        email: 'meera@mywallpro.store',
+        password: 'xeismytnfxpxuijp',
+        active: false
+      },
+      {
+        id: 10,
+        name: 'Account 10',
+        email: 'khushi@mywallbrandhub.shop',
+        password: 'syvlynvrewjttkwq',
+        active: false
+      },
+      {
+        id: 11,
+        name: 'Account 11',
+        email: 'vaishnavi@mywallbrandhub.shop',
+        password: 'yjgbtkvqlnbtdids',
+        active: false
+      },
+      {
+        id: 12,
+        name: 'Account 12',
+        email: 'aditi@mywallbrandhub.shop',
+        password: 'ykvyusoflmhycmmi',
+        active: false
+      },
+      {
+        id: 13,
+        name: 'Account 13',
+        email: 'shruti@mywallbrandhub.shop',
+        password: 'xipyoywpnzzgtkcd',
+        active: false
+      },
+      {
+        id: 14,
+        name: 'Account 14',
+        email: 'khushi@vidzyugcstudio.shop',
+        password: 'xuggvlsetwhentqz',
+        active: false
+      },
+      {
+        id: 15,
+        name: 'Account 15',
+        email: 'ishita@vidzyugcstudio.shop',
+        password: 'ppyangmcftyiyvhs',
+        active: false
+      },
+      {
+        id: 16,
+        name: 'Account 16',
+        email: 'vaishnavi@vidzyugcstudio.shop',
+        password: 'gouwnfwflmodoidb',
+        active: false
+      },
 
+ 
     ];
 
     // Select account based on frontend selection or use first active
@@ -508,6 +270,7 @@ function convertTextToHTML(text) {
     .replace(/^/, '<div style="white-space: pre-wrap; font-family: Arial, sans-serif; line-height: 1.6; color: #333;">')
     .replace(/$/, '</div>');
 }
+
 
 
 
