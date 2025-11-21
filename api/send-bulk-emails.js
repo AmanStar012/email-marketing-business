@@ -126,7 +126,7 @@ module.exports = async function handler(req, res) {
         email: 'vaishnavi@vidzyugcstudio.shop',
         password: 'gouwnfwflmodoidb',
         active: false
-      },
+      }
 
  
     ];
@@ -270,6 +270,7 @@ function convertTextToHTML(text) {
     .replace(/^/, '<div style="white-space: pre-wrap; font-family: Arial, sans-serif; line-height: 1.6; color: #333;">')
     .replace(/$/, '</div>');
 }
+
 
 
 
