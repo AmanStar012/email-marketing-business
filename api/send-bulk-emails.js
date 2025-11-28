@@ -225,12 +225,19 @@ module.exports = async function handler(req, res) {
 
         const htmlContent = convertTextToHTML(personalizedContent);
 
-        await transporter.sendMail({
-          from: currentAccount.email,
-          to: contact.email,
-          subject: personalizedSubject,
-          html: htmlContent
-        });
+
+const fromAddress =
+  currentAccount.id === 19
+    ? "khushi@vidzy.store"       // Hostinger SMTP fixed sender
+    : currentAccount.email;      // Other Gmail accounts use their own email
+
+await transporter.sendMail({
+  from: fromAddress,
+  to: contact.email,
+  subject: personalizedSubject,
+  html: htmlContent
+});
+
 
         results.sent++;
         emailsSentFromCurrentAccount++;
@@ -269,6 +276,7 @@ function convertTextToHTML(text) {
     .replace(/^/, '<div style="white-space: pre-wrap; font-family: Arial, sans-serif; line-height: 1.6; color: #333;">')
     .replace(/$/, '</div>');
 }
+
 
 
 
