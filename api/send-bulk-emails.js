@@ -140,7 +140,14 @@ module.exports = async function handler(req, res) {
         email: 'kavya@mywallpro.store',
         password: 'ogjplsanxughrxzf',
         active: false
-      }
+      },
+      {
+        id: 19,
+        name: 'Account 19',
+        email: 'kylarutmi@gmail.com',
+        password: 'vpfscfansmjtyknt',
+        active: false
+      }  
     ];
 
     // Select account based on frontend selection or use first active
@@ -282,6 +289,7 @@ function convertTextToHTML(text) {
     .replace(/^/, '<div style="white-space: pre-wrap; font-family: Arial, sans-serif; line-height: 1.6; color: #333;">')
     .replace(/$/, '</div>');
 }
+
 
 
 
