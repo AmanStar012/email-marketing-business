@@ -18,160 +18,97 @@ module.exports = async function handler(req, res) {
       {
         id: 1,
         name: 'Account 1',
-        email: 'aprajita@vidzy.in',
-        password: 'kdjabrjmwzoatheb',
-        active: true
+        email: 'ayesha@vidzy.in',
+        password: 'qcvesxglcspugoen',
+        active: false
       },
       {
         id: 2,
         name: 'Account 2',
-        email: 'aman@vidzy.in',
-        password: 'hpooftkcjrynuapd',
+        email: 'muskan@vidzy.in',
+        password: 'jugozgqkomnfwreq',
         active: false
       },
       {
         id: 3,
         name: 'Account 3',
-        email: 'khushigupta@vidzy.in',
-        password: 'gjtwjnklwevclovw',
+        email: 'radhika@vidzy.in',
+        password: 'mzidfyehdutladya',
         active: false
       },
       {
         id: 4,
         name: 'Account 4',
-        email: 'vasu@vidzy.in',
-        password: 'zgtmovcxrebpjnaf',
+        email: 'harshita@vidzy.in',
+        password: 'nsmehnzajpivjgwx',
         active: false
       },
       {
         id: 5,
         name: 'Account 5',
-        email: 'arshad@vidzy.in',
-        password: 'bxngwhiqhqmtzbrh',
+        email: 'mayank@vidzy.in',
+        password: 'bclzmpbnifoiwlxy',
         active: false
       },
       {
         id: 6,
         name: 'Account 6',
-        email: 'mayank@vidzy.in',
-        password: 'nzqbgunjxqnbnsqk',
+        email: 'khushi@mywallpro.store',
+        password: 'owplhokmkpxyliq',
         active: false
       },
       {
         id: 7,
         name: 'Account 7',
-        email: 'vibhanshu@vidzy.in',
-        password: 'bwmigdrkpumvbcrp',
-        active: false
-      },
-      {
-        id: 8,
-        name: 'Account 8',
-        email: 'khushi@mywallpro.store',
-        password: 'owplhokmkpxyliqd',
-        active: false
-      },
-      {
-        id: 9,
-        name: 'Account 9',
         email: 'meera@mywallpro.store',
         password: 'xeismytnfxpxuijp',
         active: false
       },
       {
-        id: 10,
-        name: 'Account 10',
+        id: 8,
+        name: 'Account 8',
         email: 'khushi@mywallbrandhub.shop',
         password: 'syvlynvrewjttkwq',
         active: false
       },
       {
-        id: 11,
-        name: 'Account 11',
+        id: 9,
+        name: 'Account 9',
         email: 'vaishnavi@mywallbrandhub.shop',
         password: 'yjgbtkvqlnbtdids',
         active: false
       },
       {
-        id: 12,
-        name: 'Account 12',
+        id: 10,
+        name: 'Account 10',
         email: 'aditi@mywallbrandhub.shop',
         password: 'ykvyusoflmhycmmi',
         active: false
       },
       {
-        id: 13,
-        name: 'Account 13',
+        id: 11,
+        name: 'Account 11',
         email: 'shruti@mywallbrandhub.shop',
         password: 'xipyoywpnzzgtkcd',
         active: false
       },
-      {
-        id: 14,
-        name: 'Account 14',
-        email: 'khushi@vidzyugcstudio.shop',
-        password: 'xuggvlsetwhentqz',
-        active: false
-      },
-      {
-        id: 15,
-        name: 'Account 15',
-        email: 'ishita@vidzyugcstudio.shop',
-        password: 'ppyangmcftyiyvhs',
-        active: false
-      },
-      {
-        id: 16,
-        name: 'Account 16',
-        email: 'vaishnavi@vidzyugcstudio.shop',
-        password: 'gouwnfwflmodoidb',
-        active: false
-      },
       {  
-        id: 17,
-        name: 'Account 17',
+        id: 12,
+        name: 'Account 12',
         email: 'bhavya@mywallpro.store',
         password: 'kfoetvjephsdivoi',
         active: false
       },
       {
-        id: 18,
-        name: 'Account 18',
+        id: 13,
+        name: 'Account 13',
         email: 'kavya@mywallpro.store',
         password: 'ogjplsanxughrxzf',
         active: false
-      },
-      {
-        id: 19,
-        name: 'Account 19',
-        email: 'kylarutmi@gmail.com',
-        password: 'vpfscfansmjtyknt',
-        active: false
-      }  
+      }
     ];
 
-    function createTransporterForAccount(account) {
-      if (account.id === 19) {
-        return nodemailer.createTransport({
-          host: 'smtp.hostinger.com',
-          port: 465,
-          secure: true,
-          auth: {
-            user: "khushi@vidzy.store",
-            pass: "KhushiVidzy@123"
-          }
-        });
-      } else {
-        return nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            user: account.email,
-            pass: account.password
-          }
-        });
-      }
-    }
-
+    // Select account based on frontend selection or use first active
     let currentAccount;
     if (selectedAccount) {
       currentAccount = emailAccounts.find(acc => acc.id === selectedAccount);
@@ -180,10 +117,21 @@ module.exports = async function handler(req, res) {
     }
 
     if (!currentAccount) {
-      return res.status(400).json({ success: false, error: 'No active email account found' });
+      return res.status(400).json({ 
+        success: false, 
+        error: 'No active email account found' 
+      });
     }
 
-    const transporter = createTransporterForAccount(currentAccount);
+    console.log(`🚀 Using account: ${currentAccount.email}`);
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: currentAccount.email,
+        pass: currentAccount.password
+      }
+    });
 
     const results = {
       total: contacts.length,
@@ -194,53 +142,67 @@ module.exports = async function handler(req, res) {
       accountSwitches: []
     };
 
-    const emailsPerAccount = 40;
+    // Auto-rotation settings
+    const emailsPerAccount = 40; // Gmail safe limit per hour
     let emailsSentFromCurrentAccount = 0;
     let currentAccountIndex = emailAccounts.findIndex(acc => acc.id === currentAccount.id);
 
     for (let i = 0; i < contacts.length; i++) {
       const contact = contacts[i];
-
+      
       try {
+        // Auto-switch account if limit reached
         if (emailsSentFromCurrentAccount >= emailsPerAccount && emailAccounts.length > 1) {
+          console.log(`📧 Switching account after ${emailsSentFromCurrentAccount} emails`);
+          
+          // Find next available account
           currentAccountIndex = (currentAccountIndex + 1) % emailAccounts.length;
           currentAccount = emailAccounts[currentAccountIndex];
           emailsSentFromCurrentAccount = 0;
-
-          transporter = createTransporterForAccount(currentAccount);
+          
+          // Create new transporter for new account
+          const newTransporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: currentAccount.email,
+              pass: currentAccount.password
+            }
+          });
+          
           results.accountSwitches.push({
             switchAt: i,
             newAccount: currentAccount.email
           });
+          
+          console.log(`🔄 Switched to: ${currentAccount.email}`);
         }
 
+        // Personalize email content
         let personalizedSubject = template.subject;
         let personalizedContent = template.content;
-
+        
         Object.keys(contact).forEach(key => {
           const regex = new RegExp(`{{${key}}}`, 'g');
           personalizedSubject = personalizedSubject.replace(regex, contact[key] || '');
           personalizedContent = personalizedContent.replace(regex, contact[key] || '');
         });
 
+        // ADDED: Convert text to HTML with preserved spacing
         const htmlContent = convertTextToHTML(personalizedContent);
 
-
-const fromAddress =
-  currentAccount.id === 19
-    ? "khushi@vidzy.store"       // Hostinger SMTP fixed sender
-    : currentAccount.email;      // Other Gmail accounts use their own email
-
-await transporter.sendMail({
-  from: fromAddress,
-  to: contact.email,
-  subject: personalizedSubject,
-  html: htmlContent
-});
-
+        // Send email
+        await transporter.sendMail({
+          from: currentAccount.email,
+          to: contact.email,
+          subject: personalizedSubject,
+          html: htmlContent  // Use HTML with preserved formatting
+        });
 
         results.sent++;
         emailsSentFromCurrentAccount++;
+        console.log(`✅ Email ${i + 1}/${contacts.length} sent to ${contact.email} from ${currentAccount.email}`);
+        
+        // Delay between emails (1 second)
         await new Promise(resolve => setTimeout(resolve, 1000));
 
       } catch (error) {
@@ -250,35 +212,41 @@ await transporter.sendMail({
           error: error.message,
           account: currentAccount.email
         });
+        console.log(`❌ Failed: ${contact.email} - ${error.message}`);
       }
     }
- results.successRate = results.total > 0 ? Math.round((results.sent / results.total) * 100) : 0;
 
-    return res.status(200).json({
-      success: true,
+    results.successRate = results.total > 0 ? Math.round((results.sent / results.total) * 100) : 0;
+
+    return res.status(200).json({ 
+      success: true, 
       results: results
     });
 
   } catch (error) {
     console.error('Bulk email error:', error);
-    return res.status(500).json({
-      success: false,
+    return res.status(500).json({ 
+      success: false, 
       error: error.message
     });
   }
 };
 
+// ADDED: Function to convert text to HTML with preserved spacing
 function convertTextToHTML(text) {
   if (!text) return '';
+  
   return text
+    // Convert line breaks to <br> tags
     .replace(/\r?\n/g, '<br>')
-    .replace(/  +/g, spaces => '&nbsp;'.repeat(spaces.length))
+    // Convert multiple spaces to &nbsp; to preserve spacing
+    .replace(/  +/g, function(spaces) {
+      return '&nbsp;'.repeat(spaces.length);
+    })
+    // Wrap in a div with proper CSS for spacing preservation
     .replace(/^/, '<div style="white-space: pre-wrap; font-family: Arial, sans-serif; line-height: 1.6; color: #333;">')
     .replace(/$/, '</div>');
 }
-
-
-
 
 
 
