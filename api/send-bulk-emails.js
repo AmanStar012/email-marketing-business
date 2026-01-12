@@ -50,62 +50,55 @@ module.exports = async function handler(req, res) {
         password: 'bclzmpbnifoiwlxy',
         active: false
       },
-      {
-        id: 6,
-        name: 'Account 6',
-        email: 'khushi@mywallpro.store',
-        password: 'owplhokmkpxyliq',
-        active: false
-      },
-      {
-        id: 7,
-        name: 'Account 7',
-        email: 'meera@mywallpro.store',
-        password: 'xeismytnfxpxuijp',
-        active: false
-      },
-      {
-        id: 8,
-        name: 'Account 8',
-        email: 'khushi@mywallbrandhub.shop',
-        password: 'syvlynvrewjttkwq',
-        active: false
-      },
-      {
-        id: 9,
-        name: 'Account 9',
-        email: 'vaishnavi@mywallbrandhub.shop',
-        password: 'yjgbtkvqlnbtdids',
-        active: false
-      },
-      {
-        id: 10,
-        name: 'Account 10',
-        email: 'aditi@mywallbrandhub.shop',
-        password: 'ykvyusoflmhycmmi',
-        active: false
-      },
-      {
-        id: 11,
-        name: 'Account 11',
-        email: 'shruti@mywallbrandhub.shop',
-        password: 'xipyoywpnzzgtkcd',
-        active: false
-      },
-      {  
-        id: 12,
-        name: 'Account 12',
-        email: 'bhavya@mywallpro.store',
-        password: 'kfoetvjephsdivoi',
-        active: false
-      },
-      {
-        id: 13,
-        name: 'Account 13',
-        email: 'kavya@mywallpro.store',
-        password: 'ogjplsanxughrxzf',
-        active: false
-      }
+     {
+  id: 6,
+  name: 'Account 6',
+  email: 'vaishnavi@mywallstudio.store',
+  password: 'xkhjsegdoxorvudb',
+  active: false
+},
+{
+  id: 7,
+  name: 'Account 7',
+  email: 'jhanvi@mywallstudio.store',
+  password: 'pzufbmdeiqvnqygd',
+  active: false
+},
+{
+  id: 8,
+  name: 'Account 8',
+  email: 'charvi@mywallstudio.store',
+  password: 'Ivsaqserhwinssyj',
+  active: false
+},
+{
+  id: 9,
+  name: 'Account 9',
+  email: 'shreya@mywallstudio.store',
+  password: 'rihapjkhrmebmxfs',
+  active: false
+},
+{
+  id: 10,
+  name: 'Account 10',
+  email: 'shruti@mywallstudio.store',
+  password: 'fdjsnmkuminznfgw',
+  active: false
+},
+{
+  id: 11,
+  name: 'Account 11',
+  email: 'aditi@grynowhub.online',
+  password: 'xfnzrijcuoljpqdi',
+  active: false
+},
+{
+  id: 12,
+  name: 'Account 12',
+  email: 'ishita@grynowhub.online',
+  password: 'zcwonhxbkvdaiuzs',
+  active: false
+}
     ];
 
     // Select account based on frontend selection or use first active
@@ -247,6 +240,7 @@ function convertTextToHTML(text) {
     .replace(/^/, '<div style="white-space: pre-wrap; font-family: Arial, sans-serif; line-height: 1.6; color: #333;">')
     .replace(/$/, '</div>');
 }
+
 
 
 
