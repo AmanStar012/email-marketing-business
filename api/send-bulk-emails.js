@@ -18,88 +18,53 @@ module.exports = async function handler(req, res) {
       {
         id: 1,
         name: 'Account 1',
-        email: 'ayesha@vidzy.in',
-        password: 'qcvesxglcspugoen',
+        email: 'aditi@vidzy.in',
+        password: 'shvvchwimdepbued',
         active: false
       },
       {
         id: 2,
         name: 'Account 2',
-        email: 'muskan@vidzy.in',
-        password: 'jugozgqkomnfwreq',
+        email: 'ishita@vidzy.in',
+        password: 'ksqtoxuvctsyxqvr',
         active: false
       },
       {
         id: 3,
         name: 'Account 3',
-        email: 'radhika@vidzy.in',
-        password: 'mzidfyehdutladya',
+        email: 'jhanvi@vidzy.in',
+        password: 'dycvwljlcettvlci',
         active: false
       },
       {
         id: 4,
         name: 'Account 4',
-        email: 'harshita@vidzy.in',
-        password: 'nsmehnzajpivjgwx',
+        email: 'shreya@vidzy.in',
+        password: 'rfmxrdcrkdafqvkx',
         active: false
       },
       {
         id: 5,
         name: 'Account 5',
-        email: 'mayank@vidzy.in',
-        password: 'bclzmpbnifoiwlxy',
+        email: 'shruti@vidzy.in',
+        password: 'aryluxjuyxhrfbnd',
         active: false
       },
      {
   id: 6,
   name: 'Account 6',
-  email: 'vaishnavi@mywallstudio.store',
-  password: 'xkhjsegdoxorvudb',
+  email: 'vaishnavi@vidzyagency.shop',
+  password: 'cclnhgkhohptgmwo',
   active: false
 },
 {
   id: 7,
   name: 'Account 7',
-  email: 'jhanvi@mywallstudio.store',
-  password: 'pzufbmdeiqvnqygd',
+  email: 'khushi@grynowinfluence.store',
+  password: 'qmsnimzevqvbswad',
   active: false
 },
-{
-  id: 8,
-  name: 'Account 8',
-  email: 'charvi@mywallstudio.store',
-  password: 'Ivsaqserhwinssyj',
-  active: false
-},
-{
-  id: 9,
-  name: 'Account 9',
-  email: 'shreya@mywallstudio.store',
-  password: 'rihapjkhrmebmxfs',
-  active: false
-},
-{
-  id: 10,
-  name: 'Account 10',
-  email: 'shruti@mywallstudio.store',
-  password: 'fdjsnmkuminznfgw',
-  active: false
-},
-{
-  id: 11,
-  name: 'Account 11',
-  email: 'aditi@grynowhub.online',
-  password: 'xfnzrijcuoljpqdi',
-  active: false
-},
-{
-  id: 12,
-  name: 'Account 12',
-  email: 'ishita@grynowhub.online',
-  password: 'zcwonhxbkvdaiuzs',
-  active: false
-}
-    ];
+   ];
 
     // Select account based on frontend selection or use first active
     let currentAccount;
@@ -240,6 +205,7 @@ function convertTextToHTML(text) {
     .replace(/^/, '<div style="white-space: pre-wrap; font-family: Arial, sans-serif; line-height: 1.6; color: #333;">')
     .replace(/$/, '</div>');
 }
+
 
 
 
