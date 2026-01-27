@@ -63,7 +63,7 @@ module.exports = async function handler(req, res) {
   email: 'khushi@grynowinfluence.store',
   password: 'qmsnimzevqvbswad',
   active: false
-},
+}
    ];
 
     // Select account based on frontend selection or use first active
@@ -205,6 +205,7 @@ function convertTextToHTML(text) {
     .replace(/^/, '<div style="white-space: pre-wrap; font-family: Arial, sans-serif; line-height: 1.6; color: #333;">')
     .replace(/$/, '</div>');
 }
+
 
 
 
