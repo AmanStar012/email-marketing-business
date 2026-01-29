@@ -8,15 +8,21 @@
     "deploy": "vercel --prod"
   },
   "dependencies": {
-    "nodemailer": "^6.9.7",
-    "express-rate-limit": "^7.1.5",
     "cors": "^2.8.5",
-    "helmet": "^7.1.0"
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "nodemailer": "^6.9.7",
+    "redis": "^5.10.0"
   },
   "devDependencies": {
     "vercel": "^32.7.2"
   },
-  "keywords": ["email", "marketing", "nodemailer", "vercel"],
+  "keywords": [
+    "email",
+    "marketing",
+    "nodemailer",
+    "vercel"
+  ],
   "author": "Your Name",
   "license": "MIT"
 }
