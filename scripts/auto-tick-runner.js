@@ -1,3 +1,5 @@
+console.log("RUNNER namespace =", process.env.REDIS_NAMESPACE);
+
 const {
   sleep,
   convertTextToHTML,

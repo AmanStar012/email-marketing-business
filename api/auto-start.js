@@ -1,7 +1,9 @@
 const { cors, redisGet, redisSet, redisDel } = require("./_shared");
 
-console.log("Runner namespace:", process.env.REDIS_NAMESPACE);
-
+/**
+ * Check if two contact lists are effectively the same
+ * (used for safe resume logic)
+ */
 function isSameContacts(a = [], b = []) {
   if (!Array.isArray(a) || !Array.isArray(b)) return false;
   if (a.length !== b.length) return false;
@@ -18,46 +20,46 @@ function isSameContacts(a = [], b = []) {
 module.exports = async function handler(req, res) {
   cors(res);
   if (req.method === "OPTIONS") return res.status(200).end();
+
   if (req.method !== "POST") {
-    return res.status(405).json({ success: false, error: "Method not allowed" });
+    return res.status(405).json({
+      success: false,
+      error: "Method not allowed"
+    });
   }
 
   try {
     const now = Date.now();
     const { contacts, brandName, template } = req.body || {};
 
+    /* =========================
+       Basic validations
+       ========================= */
     if (!Array.isArray(contacts) || contacts.length === 0) {
-      return res.status(400).json({ success: false, error: "contacts is required" });
+      return res.status(400).json({
+        success: false,
+        error: "contacts is required"
+      });
     }
 
-    const hasBrand =
-      Array.isArray(brandName) ? brandName.length > 0 : Boolean(brandName);
-    if (!hasBrand) {
-      return res.status(400).json({ success: false, error: "brandName is required" });
+    if (!brandName) {
+      return res.status(400).json({
+        success: false,
+        error: "brandName is required"
+      });
     }
 
-    const hasSubject =
-      Array.isArray(template?.subject)
-        ? template.subject.length > 0
-        : Boolean(template?.subject);
-
-    const hasContent =
-      Array.isArray(template?.content)
-        ? template.content.length > 0
-        : Boolean(template?.content);
-
-    if (!hasSubject || !hasContent) {
+    if (!template?.subject || !template?.content) {
       return res.status(400).json({
         success: false,
         error: "template.subject and template.content are required"
       });
     }
 
-    /**
-     * ===============================
-     * 🔁 RESUME ONLY IF SAME CONTACTS
-     * ===============================
-     */
+    /* =========================
+       Resume last stopped campaign
+       (only if same contacts)
+       ========================= */
     const lastId = await redisGet("auto:campaign:last");
 
     if (lastId) {
@@ -74,7 +76,7 @@ module.exports = async function handler(req, res) {
         await redisSet(`auto:campaign:${lastId}`, lastCampaign);
         await redisSet("auto:campaign:active", lastId);
 
-        // reset cooldown + retry
+        // Reset retry / cooldown state
         await redisDel(`auto:campaign:${lastId}:lastSendAt`);
         await redisDel(`auto:campaign:${lastId}:retry`);
 
@@ -88,7 +90,11 @@ module.exports = async function handler(req, res) {
 
         const eventsKey = `auto:campaign:${lastId}:events`;
         const events = (await redisGet(eventsKey)) || [];
-        events.push({ ts: now, status: "campaign_resumed", campaignId: lastId });
+        events.push({
+          ts: now,
+          status: "campaign_resumed",
+          campaignId: lastId
+        });
         await redisSet(eventsKey, events.slice(-300));
 
         return res.status(200).json({
@@ -99,11 +105,9 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    /**
-     * ===============================
-     * 🆕 NEW CAMPAIGN (NEW CSV)
-     * ===============================
-     */
+    /* =========================
+       Create NEW campaign
+       ========================= */
     const campaignId = `c_${Date.now()}`;
 
     const campaign = {
@@ -141,7 +145,11 @@ module.exports = async function handler(req, res) {
     });
 
     await redisSet(`auto:campaign:${campaignId}:events`, [
-      { ts: now, status: "campaign_started", campaignId }
+      {
+        ts: now,
+        status: "campaign_started",
+        campaignId
+      }
     ]);
 
     return res.status(200).json({
@@ -149,8 +157,10 @@ module.exports = async function handler(req, res) {
       campaignId,
       resumed: false
     });
-
   } catch (e) {
-    return res.status(500).json({ success: false, error: e.message });
+    return res.status(500).json({
+      success: false,
+      error: e.message
+    });
   }
 };
