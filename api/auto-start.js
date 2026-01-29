@@ -1,5 +1,7 @@
 const { cors, redisGet, redisSet, redisDel } = require("./_shared");
 
+console.log("Runner namespace:", process.env.REDIS_NAMESPACE);
+
 function isSameContacts(a = [], b = []) {
   if (!Array.isArray(a) || !Array.isArray(b)) return false;
   if (a.length !== b.length) return false;
