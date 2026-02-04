@@ -1,12 +1,24 @@
 const { cors, redisGet, redisSet, redisDel } = require("./_shared");
 
+function normalizeGroup(raw) {
+  if (raw == null || raw === "") return "vidzy";
+  const g = String(raw || "").trim().toLowerCase();
+  if (g === "vidzy" || g === "grynow") return g;
+  return null;
+}
+
 module.exports = async function handler(req, res) {
   cors(res);
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ success: false, error: "Method not allowed" });
 
   try {
-    const activeId = await redisGet("auto:campaign:active");
+    const groupId = normalizeGroup(req.body?.group);
+    if (!groupId) {
+      return res.status(400).json({ success: false, error: "group must be 'vidzy' or 'grynow'" });
+    }
+
+    const activeId = await redisGet(`auto:campaign:active:${groupId}`);
     if (!activeId) {
       return res.status(200).json({ success: true, message: "No active campaign" });
     }
@@ -23,7 +35,7 @@ module.exports = async function handler(req, res) {
       await redisSet(campaignKey, campaign);
     }
 
-    await redisSet("auto:campaign:last", activeId);
+    await redisSet(`auto:campaign:last:${groupId}`, activeId);
 
     // Update live state
     const live = (await redisGet(liveKey)) || {};
@@ -44,7 +56,7 @@ module.exports = async function handler(req, res) {
     await redisSet(eventsKey, events);
 
     // Clear active pointer
-    await redisDel("auto:campaign:active");
+    await redisDel(`auto:campaign:active:${groupId}`);
 
     return res.status(200).json({ success: true, message: "Campaign stopped" });
   } catch (e) {

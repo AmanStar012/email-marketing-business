@@ -138,7 +138,8 @@ function looksLikeAccountLevelFailure(err) {
     msg.includes("account disabled") ||
     msg.includes("not authorized") ||
     msg.includes("smtp authentication") ||
-    msg.includes("login not allowed")
+    msg.includes("login not allowed") ||
+    msg.includes("daily user sending limit exceeded")
   );
 }
 
@@ -191,6 +192,15 @@ async function redisSet(key, value) {
   await client.set(ns(key), v);
 }
 
+async function redisSetNx(key, value, ttlSeconds) {
+  const client = await getRedisClient();
+  const v = typeof value === "string" ? value : JSON.stringify(value);
+  if (ttlSeconds && Number(ttlSeconds) > 0) {
+    return await client.set(ns(key), v, { NX: true, EX: Number(ttlSeconds) });
+  }
+  return await client.set(ns(key), v, { NX: true });
+}
+
 async function redisDel(key) {
   const client = await getRedisClient();
   await client.del(ns(key));
@@ -209,5 +219,6 @@ module.exports = {
   loadAccountsConfig,
   redisGet,
   redisSet,
+  redisSetNx,
   redisDel
 };

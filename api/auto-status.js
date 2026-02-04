@@ -1,19 +1,32 @@
 const { cors, redisGet } = require("./_shared");
 
+function normalizeGroup(raw) {
+  if (raw == null || raw === "") return "vidzy";
+  const g = String(raw || "").trim().toLowerCase();
+  if (g === "vidzy" || g === "grynow") return g;
+  return null;
+}
+
 module.exports = async function handler(req, res) {
   cors(res);
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "GET") return res.status(405).json({ success: false, error: "Method not allowed" });
 
   try {
-    const activeId = await redisGet("auto:campaign:active");
-    const lastId = await redisGet("auto:campaign:last");
+    const groupId = normalizeGroup(req.query?.group);
+    if (!groupId) {
+      return res.status(400).json({ success: false, error: "group must be 'vidzy' or 'grynow'" });
+    }
+
+    const activeId = await redisGet(`auto:campaign:active:${groupId}`);
+    const lastId = await redisGet(`auto:campaign:last:${groupId}`);
 
     const id = activeId || lastId;
 
     if (!id) {
       return res.status(200).json({
         success: true,
+        group: groupId,
         activeId: null,
         lastId: null,
         campaign: null,
@@ -54,6 +67,7 @@ module.exports = async function handler(req, res) {
 
     return res.status(200).json({
       success: true,
+      group: groupId,
       activeId,
       lastId,
       campaign: {

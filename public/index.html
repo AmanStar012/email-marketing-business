@@ -20,6 +20,13 @@
       color: #333
     }
 
+    .group-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start
+    }
+
     .container {
       max-width: 1400px;
       margin: 0 auto;
@@ -450,6 +457,16 @@
       flex-wrap: wrap
     }
 
+    .account-toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px
+    }
+
+    .account-search {
+      flex: 1
+    }
+
     .progress-container {
       padding: 30px;
       background: #fff;
@@ -651,6 +668,10 @@
     }
 
     @media (max-width:768px) {
+      .group-grid {
+        grid-template-columns: 1fr
+      }
+
       .main-content {
         grid-template-columns: 1fr;
         gap: 20px;
@@ -673,7 +694,8 @@
 </head>
 
 <body>
-  <div class="container">
+  <div class="group-grid" id="groupGrid">
+  <div class="container" data-group="vidzy">
     <div class="header">
       <h1>🚀 Email Marketing Bussiness</h1>
       <div class="stats-grid">
@@ -800,41 +822,18 @@
 
       <!-- Right Column -->
       <div class="right-column">
-        <!-- Campaign Settings (Manual) -->
-        <div class="section">
-          <div class="section-header">
-            <div class="section-icon">3</div>
-            <div class="section-title">Manual Campaign</div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Campaign Name</label>
-            <input type="text" class="form-control" id="campaignName" placeholder="Q1 2024 Newsletter">
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Send Rate</label>
-            <select class="form-control" id="sendRate">
-              <option value="30">30 emails/hour per account</option>
-              <option value="40" selected>40 emails/hour per account</option>
-              <option value="50">50 emails/hour per account</option>
-            </select>
-          </div>
-
-          <button class="btn btn-success" id="startCampaign">🚀 Launch Manual Campaign</button>
-        </div>
-
         <!-- Email Accounts -->
         <div class="section">
           <div class="section-header">
             <div class="section-icon">4</div>
             <div class="section-title">Email Accounts</div>
           </div>
+          <div class="account-toolbar">
+            <input type="text" class="form-control account-search" id="accountSearch" placeholder="Search accounts...">
+          </div>
           <div class="email-accounts" id="emailAccounts"></div>
 
           <div class="action-buttons">
-            <button class="btn btn-small" id="previewBtn">👁️ Preview</button>
-            <button class="btn btn-small" id="testBtn">🧪 Test Send</button>
             <button class="btn btn-small" id="saveBtn">💾 Save Template</button>
             <button class="btn btn-small btn-secondary" id="downloadSample">📥 Sample CSV</button>
           </div>
@@ -846,517 +845,510 @@
   </div>
 
   <script>
-    // Global State
+    const GROUPS = ["vidzy", "grynow"];
+
     const state = {
-      contacts: [],
-      emailAccounts: [],
-      autoCampaignId: null,
-      stats: { totalSent: 0, successRate: 0, inQueue: 0, failed: 0 }
+      groups: {
+        vidzy: {
+          contacts: [],
+          emailAccounts: [],
+          accountSearch: "",
+          stats: { totalSent: 0, successRate: 0, inQueue: 0, failed: 0 }
+        },
+        grynow: {
+          contacts: [],
+          emailAccounts: [],
+          accountSearch: "",
+          stats: { totalSent: 0, successRate: 0, inQueue: 0, failed: 0 }
+        }
+      }
     };
 
-    // API Client
+    function groupEl(id, groupId) {
+      return document.getElementById(groupId === "vidzy" ? id : `${id}-${groupId}`);
+    }
+
+    function accountGroup(email) {
+      const domain = String(email || "").split("@")[1] || "";
+      const d = domain.toLowerCase();
+      if (d.includes("vidzy")) return "vidzy";
+      if (d.includes("grynow")) return "grynow";
+      return null;
+    }
+
     class EmailMarketingAPI {
-      constructor(baseURL = '') { this.baseURL = baseURL; }
-
-      async sendEmail(emailData) {
-        const response = await fetch(`${this.baseURL}/api/send-email`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(emailData)
-        });
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || 'Failed to send email');
-        return result;
-      }
-
-      async sendBulkEmails(bulkData) {
-        const response = await fetch(`${this.baseURL}/api/send-bulk-emails`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(bulkData)
-        });
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || 'Failed to send bulk emails');
-        return result;
+      constructor(baseURL = "") {
+        this.baseURL = baseURL;
       }
 
       async getAccounts() {
         const response = await fetch(`${this.baseURL}/api/accounts`);
         const result = await response.json();
-        if (!response.ok) throw new Error(result.error || 'Failed to fetch accounts');
+        if (!response.ok) throw new Error(result.error || "Failed to fetch accounts");
         return result.accounts;
       }
 
       async setAccountStatus(accountId, connected) {
         const response = await fetch(`${this.baseURL}/api/accounts-set-status`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ accountId, connected })
         });
         const result = await response.json();
-        if (!response.ok) throw new Error(result.error || 'Failed to set status');
+        if (!response.ok) throw new Error(result.error || "Failed to set status");
         return result;
       }
 
       async autoStart(payload) {
         const response = await fetch(`${this.baseURL}/api/auto-start`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
         const result = await response.json();
-        if (!response.ok) throw new Error(result.error || 'Failed to start auto campaign');
+        if (!response.ok) throw new Error(result.error || "Failed to start auto campaign");
         return result;
       }
 
-      async autoStop() {
-        const response = await fetch(`${this.baseURL}/api/auto-stop`, { method: 'POST' });
+      async autoStop(group) {
+        const response = await fetch(`${this.baseURL}/api/auto-stop`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ group })
+        });
         const result = await response.json();
-        if (!response.ok) throw new Error(result.error || 'Failed to stop auto campaign');
+        if (!response.ok) throw new Error(result.error || "Failed to stop auto campaign");
         return result;
       }
 
-      async autoStatus() {
-        const response = await fetch(`${this.baseURL}/api/auto-status`);
+      async autoStatus(group) {
+        const response = await fetch(`${this.baseURL}/api/auto-status?group=${encodeURIComponent(group || "")}`);
         const result = await response.json();
-        if (!response.ok) throw new Error(result.error || 'Failed to fetch auto status');
+        if (!response.ok) throw new Error(result.error || "Failed to fetch auto status");
         return result;
       }
     }
 
     const emailAPI = new EmailMarketingAPI();
 
-    document.addEventListener('DOMContentLoaded', () => {
+    function setupGroupContainers() {
+      const grid = document.getElementById("groupGrid");
+      if (!grid) return;
+      const base = grid.querySelector(".container");
+      if (!base) return;
+
+      base.dataset.group = "vidzy";
+      const title = base.querySelector(".header h1");
+      if (title) title.textContent = "Email Marketing - Vidzy";
+
+      const clone = base.cloneNode(true);
+      clone.dataset.group = "grynow";
+      clone.querySelectorAll("[id]").forEach((el) => {
+        el.id = `${el.id}-grynow`;
+      });
+      clone.querySelectorAll("[onclick]").forEach((el) => {
+        const v = el.getAttribute("onclick") || "";
+        if (v.includes("csvInput")) {
+          el.setAttribute("onclick", v.replace(/csvInput/g, "csvInput-grynow"));
+        }
+      });
+      const cloneTitle = clone.querySelector(".header h1");
+      if (cloneTitle) cloneTitle.textContent = "Email Marketing - Grynow";
+
+      grid.appendChild(clone);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      setupGroupContainers();
       initializeApp();
     });
 
     function initializeApp() {
-      loadSavedTemplateFromLocalStorage();
-      setupEventListeners();
-      initializeUploadZone();
-      loadAccountsFromBackend();
-      updateMergeFields([]);
-      updateStats();
-      refreshAutoStatus();
-      log('UI ready. Manual + Auto available.', 'info');
+      GROUPS.forEach((groupId) => {
+        loadSavedTemplateFromLocalStorage(groupId);
+        setupEventListeners(groupId);
+        initializeUploadZone(groupId);
+        loadAccountsFromBackend(groupId);
+        updateMergeFields(groupId, []);
+        updateStats(groupId);
+        refreshAutoStatus(groupId);
+      });
+
+      log("UI ready. Auto available.", "info");
 
       setInterval(() => {
-        refreshAutoStatus().catch(() => { });
-        loadAccountsFromBackend().catch(() => { });
+        GROUPS.forEach((groupId) => {
+          refreshAutoStatus(groupId).catch(() => {});
+          loadAccountsFromBackend(groupId).catch(() => {});
+        });
       }, 5000);
     }
 
-    function setupEventListeners() {
+    function setupEventListeners(groupId) {
       const bindings = [
         {
-          id: "csvFileInput",
+          id: "csvInput",
           event: "change",
           handler: (e) => {
-            if (e.target.files && e.target.files[0]) {
-              processFile(e.target.files[0]);
-            }
+            if (e.target.files && e.target.files[0]) processFile(groupId, e.target.files[0]);
           }
         },
+        { id: "autoStartBtn", event: "click", handler: () => startAutoCampaign(groupId) },
+        { id: "autoStopBtn", event: "click", handler: () => stopAutoCampaign(groupId) },
         {
-          id: "autoStartBtn",
-          event: "click",
-          handler: startAutoCampaign
+          id: "accountSearch",
+          event: "input",
+          handler: (e) => {
+            state.groups[groupId].accountSearch = e.target.value || "";
+            renderEmailAccounts(groupId);
+          }
         },
-        {
-          id: "autoStopBtn",
-          event: "click",
-          handler: stopAutoCampaign
-        },
-        {
-          id: "startCampaign",
-          event: "click",
-          handler: startCampaignManual
-        }
+        { id: "saveBtn", event: "click", handler: () => saveTemplate(groupId) },
+        { id: "downloadSample", event: "click", handler: () => downloadSampleCSV(groupId) }
       ];
 
-      // Button / file bindings
       bindings.forEach(({ id, event, handler }) => {
-        const el = document.getElementById(id);
-        if (!el) {
-          console.warn(`Element not found: #${id}`);
-          return;
-        }
+        const el = groupEl(id, groupId);
+        if (!el) return;
         el.addEventListener(event, handler);
       });
 
-      // 🔥 TEMPLATE AUTO-SAVE (THIS WAS MISSING AFTER 5 SUBJECT CHANGE)
-      ['brandName', 'subjectLine', 'emailContent'].forEach(id => {
-        const el = document.getElementById(id);
+      ["brandName", "subjectLine", "emailContent"].forEach((id) => {
+        const el = groupEl(id, groupId);
         if (!el) return;
-        el.addEventListener('input', saveTemplateToLocalStorage);
+        el.addEventListener("input", () => saveTemplateToLocalStorage(groupId));
       });
     }
 
+    function initializeUploadZone(groupId) {
+      const uploadZone = groupEl("uploadZone", groupId);
+      const csvInput = groupEl("csvInput", groupId);
+      if (!uploadZone || !csvInput) return;
 
-
-
-    function initializeUploadZone() {
-      const uploadZone = document.getElementById('uploadZone');
-      const csvInput = document.getElementById('csvInput');
-
-      uploadZone.addEventListener('click', (e) => {
+      uploadZone.addEventListener("click", (e) => {
         e.preventDefault();
         csvInput.click();
       });
-
-      uploadZone.addEventListener('dragover', (e) => {
+      uploadZone.addEventListener("dragover", (e) => {
         e.preventDefault();
-        uploadZone.classList.add('dragover');
+        uploadZone.classList.add("dragover");
       });
-      uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
-      uploadZone.addEventListener('drop', (e) => {
+      uploadZone.addEventListener("dragleave", () => uploadZone.classList.remove("dragover"));
+      uploadZone.addEventListener("drop", (e) => {
         e.preventDefault();
-        uploadZone.classList.remove('dragover');
+        uploadZone.classList.remove("dragover");
         const files = e.dataTransfer.files;
-        if (files.length > 0) processFile(files[0]);
+        if (files.length > 0) processFile(groupId, files[0]);
       });
-      csvInput.addEventListener('change', (e) => {
+      csvInput.addEventListener("change", (e) => {
         const file = e.target.files[0];
-        if (file) processFile(file);
+        if (file) processFile(groupId, file);
       });
-
-      log('Upload zone initialized', 'info');
     }
 
-    async function loadAccountsFromBackend() {
+    async function loadAccountsFromBackend(groupId) {
       try {
         const accounts = await emailAPI.getAccounts();
-        state.emailAccounts = accounts.map((a, idx) => ({
+        const filtered = accounts.filter((a) => accountGroup(a.email) === groupId);
+        state.groups[groupId].emailAccounts = filtered.map((a, idx) => ({
           ...a,
           provider: `Gmail Account ${a.id}`,
           active: idx === 0
         }));
-        renderEmailAccounts();
-        log(`Loaded ${state.emailAccounts.length} accounts from backend`, 'success');
+        renderEmailAccounts(groupId);
       } catch (e) {
-        log(`Failed to load accounts: ${e.message}`, 'error');
+        log(`Failed to load accounts (${groupId}): ${e.message}`, "error");
       }
     }
 
-    function processFile(file) {
-      if (!file.name.toLowerCase().endsWith('.csv')) return log('Please select a CSV file', 'error');
+    function processFile(groupId, file) {
+      if (!file.name.toLowerCase().endsWith(".csv")) {
+        log("Please select a CSV file", "error");
+        return;
+      }
       const reader = new FileReader();
-      reader.onload = (e) => parseCSV(e.target.result);
-      reader.onerror = () => log('Error reading file', 'error');
+      reader.onload = (e) => parseCSV(groupId, e.target.result);
+      reader.onerror = () => log("Error reading file", "error");
       reader.readAsText(file);
-      log(`Processing: ${file.name} (${formatFileSize(file.size)})`, 'info');
+      log(`Processing (${groupId}): ${file.name} (${formatFileSize(file.size)})`, "info");
     }
 
-    function parseCSV(csvData) {
+    function parseCSV(groupId, csvData) {
       try {
-        const lines = csvData.split('\n').filter(l => l.trim() !== '');
-        if (lines.length < 2) return log('CSV must have header + at least 1 row', 'error');
+        const lines = csvData.split("\n").filter((l) => l.trim() !== "");
+        if (lines.length < 2) {
+          log("CSV must have header + at least 1 row", "error");
+          return;
+        }
 
-        const headers = parseCSVLine(lines[0]).map(h => h.replace(/^\uFEFF/, '').trim());
-        state.contacts = [];
+        const headers = parseCSVLine(lines[0]).map((h) => h.replace(/^\uFEFF/, "").trim());
+        state.groups[groupId].contacts = [];
 
         for (let i = 1; i < lines.length; i++) {
           const line = lines[i].trim();
           if (!line) continue;
           const values = parseCSVLine(line);
           const contact = {};
-          headers.forEach((h, idx) => contact[h] = values[idx] || '');
-          const hasAny = Object.values(contact).some(v => String(v).trim() !== '');
-          if (hasAny) state.contacts.push(contact);
+          headers.forEach((h, idx) => (contact[h] = values[idx] || ""));
+          const hasAny = Object.values(contact).some((v) => String(v).trim() !== "");
+          if (hasAny) state.groups[groupId].contacts.push(contact);
         }
 
-        if (state.contacts.length === 0) return log('No valid contacts found', 'error');
+        if (state.groups[groupId].contacts.length === 0) {
+          log("No valid contacts found", "error");
+          return;
+        }
 
-        displayContacts();
-        updateMergeFields(headers);
-        document.getElementById('csvCountLabel').textContent = `CSV Emails: ${state.contacts.length}`;
-        updateStatsFromLocalCsvOnly();
-        log(`✅ Loaded ${state.contacts.length} contacts`, 'success');
+        displayContacts(groupId);
+        updateMergeFields(groupId, headers);
+        const countEl = groupEl("csvCountLabel", groupId);
+        if (countEl) countEl.textContent = `CSV Emails: ${state.groups[groupId].contacts.length}`;
+        updateStatsFromLocalCsvOnly(groupId);
+        log(`CSV loaded (${groupId}) - ${state.groups[groupId].contacts.length} contacts`, "success");
       } catch (e) {
-        log(`CSV parse error: ${e.message}`, 'error');
+        log(`CSV parse error (${groupId}): ${e.message}`, "error");
       }
     }
 
     function parseCSVLine(line) {
       const result = [];
-      let current = '';
+      let current = "";
       let inQuotes = false;
       let i = 0;
 
       while (i < line.length) {
         const char = line[i];
         const nextChar = line[i + 1];
-
         if (char === '"') {
           if (inQuotes && nextChar === '"') {
             current += '"';
             i += 2;
             continue;
-          } else {
-            inQuotes = !inQuotes;
           }
-        } else if (char === ',' && !inQuotes) {
+          inQuotes = !inQuotes;
+        } else if (char === "," && !inQuotes) {
           result.push(current.trim());
-          current = '';
+          current = "";
         } else {
           current += char;
         }
         i++;
       }
+
       result.push(current.trim());
-      return result.map(f => f.replace(/^"(.*)"$/, '$1').trim().replace(/\r$/, ''));
+      return result.map((f) => f.replace(/^"(.*)"$/, "$1").trim().replace(/$/, ""));
     }
 
-    function displayContacts() {
-      const preview = document.getElementById('contactsPreview');
-      const list = document.getElementById('contactsList');
-      preview.style.display = 'block';
-      list.innerHTML = '';
+    function displayContacts(groupId) {
+      const preview = groupEl("contactsPreview", groupId);
+      const list = groupEl("contactsList", groupId);
+      if (!preview || !list) return;
 
-      const show = state.contacts.slice(0, 10);
-      show.forEach(c => {
-        const item = document.createElement('div');
-        item.className = 'contact-item';
+      preview.style.display = "block";
+      list.innerHTML = "";
+      const contacts = state.groups[groupId].contacts;
+      const show = contacts.slice(0, 10);
+
+      show.forEach((c) => {
+        const item = document.createElement("div");
+        item.className = "contact-item";
         const name = getContactName(c);
         const email = getContactEmail(c);
-        item.innerHTML = `
-        <div>
-          <div class="contact-name">${escapeHtml(name)}</div>
-          <div class="contact-email">${escapeHtml(email)}</div>
-        </div>
-      `;
+        item.innerHTML = `<div><div class="contact-name">${escapeHtml(name)}</div><div class="contact-email">${escapeHtml(email)}</div></div>`;
         list.appendChild(item);
       });
 
-      if (state.contacts.length > 10) {
-        const more = document.createElement('div');
-        more.className = 'contact-item';
-        more.innerHTML = `<span class="contact-name">...and ${state.contacts.length - 10} more</span>`;
+      if (contacts.length > 10) {
+        const more = document.createElement("div");
+        more.className = "contact-item";
+        more.innerHTML = `<span class="contact-name">...and ${contacts.length - 10} more</span>`;
         list.appendChild(more);
       }
     }
 
     function getContactName(contact) {
-      const firstName = contact.firstName || contact.first_name || contact['First Name'] || contact.fname || '';
-      const lastName = contact.lastName || contact.last_name || contact['Last Name'] || contact.lname || '';
-      const fullName = contact.name || contact.Name || contact.fullName || contact.full_name || '';
+      const firstName = contact.firstName || contact.first_name || contact["First Name"] || contact.fname || "";
+      const lastName = contact.lastName || contact.last_name || contact["Last Name"] || contact.lname || "";
+      const fullName = contact.name || contact.Name || contact.fullName || contact.full_name || "";
       if (firstName || lastName) return `${firstName} ${lastName}`.trim();
       if (fullName) return fullName;
       const email = getContactEmail(contact);
-      if (email) return email.split('@')[0];
-      return `Contact`;
+      if (email) return email.split("@")[0];
+      return "Contact";
     }
 
     function getContactEmail(contact) {
-      return contact.email ||
-        contact.Email ||
-        contact.EMAIL ||
-        contact['Email Address'] ||
-        contact.email_address ||
-        contact.mail ||
-        contact.Mail || '';
+      return contact.email || contact.Email || contact.EMAIL || contact["Email Address"] || contact.email_address || contact.mail || contact.Mail || "";
     }
 
-    function updateMergeFields(headers) {
-      const container = document.getElementById('mergeFields');
-      container.innerHTML = '';
+    function updateMergeFields(groupId, headers) {
+      const container = groupEl("mergeFields", groupId);
+      if (!container) return;
+      container.innerHTML = "";
 
-      ['brandName', 'senderName'].forEach(k => {
-        const field = document.createElement('button');
-        field.className = 'merge-field';
+      ["brandName", "senderName"].forEach((k) => {
+        const field = document.createElement("button");
+        field.className = "merge-field";
         field.textContent = `{{${k}}}`;
-        field.addEventListener('click', () => insertMergeField(`{{${k}}}`));
+        field.addEventListener("click", () => insertMergeField(groupId, `{{${k}}}`));
         container.appendChild(field);
       });
 
-      (headers || []).forEach(h => {
-        const field = document.createElement('button');
-        field.className = 'merge-field';
+      (headers || []).forEach((h) => {
+        const field = document.createElement("button");
+        field.className = "merge-field";
         field.textContent = `{{${h}}}`;
-        field.addEventListener('click', () => insertMergeField(`{{${h}}}`));
+        field.addEventListener("click", () => insertMergeField(groupId, `{{${h}}}`));
         container.appendChild(field);
       });
     }
 
-    function insertMergeField(field) {
-      const textarea = document.getElementById('emailContent');
+    function insertMergeField(groupId, field) {
+      const textarea = groupEl("emailContent", groupId);
+      if (!textarea) return;
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
       const text = textarea.value;
       textarea.value = text.substring(0, start) + field + text.substring(end);
       textarea.setSelectionRange(start + field.length, start + field.length);
       textarea.focus();
-      saveTemplateToLocalStorage();
+      saveTemplateToLocalStorage(groupId);
     }
 
-    function renderEmailAccounts() {
-      const container = document.getElementById('emailAccounts');
-      container.innerHTML = '';
+    function renderEmailAccounts(groupId) {
+      const container = groupEl("emailAccounts", groupId);
+      if (!container) return;
+      container.innerHTML = "";
 
-      state.emailAccounts.forEach(account => {
-        const accountDiv = document.createElement('div');
-        accountDiv.className = `email-account ${account.connected ? 'connected' : 'disconnected'} ${account.active ? 'active-account' : ''}`;
+      const groupState = state.groups[groupId];
+      const query = (groupState.accountSearch || "").trim().toLowerCase();
+      const accounts = groupState.emailAccounts.filter((a) => {
+        if (!query) return true;
+        const email = String(a.email || "").toLowerCase();
+        const sender = String(a.senderName || "").toLowerCase();
+        return email.includes(query) || sender.includes(query);
+      });
+
+      if (accounts.length === 0) {
+        container.innerHTML = '<div class="mini">No accounts found</div>';
+        return;
+      }
+
+      accounts.forEach((account) => {
+        const accountDiv = document.createElement("div");
+        accountDiv.className = `email-account ${account.connected ? "connected" : "disconnected"} ${account.active ? "active-account" : ""}`;
         accountDiv.innerHTML = `
-        <div class="account-header">
-          <div>
-            <div class="account-email">
-              ${account.active ? '🟢' : '⚪'} ${escapeHtml(account.email)}
+          <div class="account-header">
+            <div>
+              <div class="account-email">${account.active ? "Primary" : "Account"}: ${escapeHtml(account.email)}</div>
+              <div class="account-provider">Sender: <strong>${escapeHtml(account.senderName || "")}</strong></div>
+              ${account.lastError ? `<div class="account-provider" style="color:#b00020;">Last error: ${escapeHtml(account.lastError)}</div>` : ""}
             </div>
-            <div class="account-provider">Sender: <strong>${escapeHtml(account.senderName || '')}</strong></div>
-            ${account.lastError ? `<div class="account-provider" style="color:#b00020;">Last error: ${escapeHtml(account.lastError)}</div>` : ''}
+            <div class="status-badge ${account.connected ? "status-connected" : "status-disconnected"}">
+              ${account.connected ? "Connected" : "Disconnected"}
+            </div>
           </div>
-          <div class="status-badge ${account.connected ? 'status-connected' : 'status-disconnected'}">
-            ${account.connected ? '✅ Connected' : '❌ Disconnected'}
-          </div>
-        </div>
-        <div class="account-actions">
-          <button class="btn btn-small ${account.active ? 'btn-success' : 'btn-secondary'}"
-                  onclick="setActiveAccount(${account.id})">
-            ${account.active ? '🟢 Primary' : '⚪ Set Primary'}
-          </button>
-          <button class="btn btn-small ${account.connected ? 'btn-danger' : 'btn-success'}"
-                  onclick="toggleConnection(${account.id})">
-            ${account.connected ? 'Disconnect' : 'Connect'}
-          </button>
-        </div>
-      `;
+          <div class="account-actions">
+            <button class="btn btn-small ${account.active ? "btn-success" : "btn-secondary"}" onclick="setActiveAccount('${groupId}', ${account.id})">
+              ${account.active ? "Primary" : "Set Primary"}
+            </button>
+            <button class="btn btn-small ${account.connected ? "btn-danger" : "btn-success"}" onclick="toggleConnection('${groupId}', ${account.id})">
+              ${account.connected ? "Disconnect" : "Connect"}
+            </button>
+          </div>`;
         container.appendChild(accountDiv);
       });
     }
 
-    function setActiveAccount(accountId) {
-      state.emailAccounts.forEach(a => a.active = false);
-      const selected = state.emailAccounts.find(a => a.id === accountId);
-      if (selected) {
-        selected.active = true;
-        log(`🎯 Primary set: ${selected.email}`, 'info');
-      }
-      renderEmailAccounts();
+    function setActiveAccount(groupId, accountId) {
+      const accounts = state.groups[groupId].emailAccounts;
+      accounts.forEach((a) => (a.active = false));
+      const selected = accounts.find((a) => a.id === accountId);
+      if (selected) selected.active = true;
+      renderEmailAccounts(groupId);
     }
 
-    async function toggleConnection(accountId) {
-      const account = state.emailAccounts.find(a => a.id === accountId);
+    async function toggleConnection(groupId, accountId) {
+      const account = state.groups[groupId].emailAccounts.find((a) => a.id === accountId);
       if (!account) return;
-
       const newStatus = !account.connected;
 
       try {
         await emailAPI.setAccountStatus(accountId, newStatus);
         account.connected = newStatus;
         if (newStatus) account.lastError = "";
-        renderEmailAccounts();
-        log(`${account.email} ${newStatus ? 'connected' : 'disconnected'} (saved)`, 'info');
+        renderEmailAccounts(groupId);
       } catch (e) {
-        log(`Failed to change status: ${e.message}`, 'error');
+        log(`Failed to change status (${groupId}): ${e.message}`, "error");
       }
     }
 
-    async function startCampaignManual() {
-      if (state.contacts.length === 0) return log('Upload contacts first', 'error');
-      const activeAccount = state.emailAccounts.find(a => a.active);
-      if (!activeAccount) return log('Select a primary account', 'error');
-
-      const subject = document.getElementById('subjectLine').value;
-      const content = document.getElementById('emailContent').value;
-      if (!subject || !content) return log('Fill subject and content', 'error');
-
-      try {
-        document.getElementById('startCampaign').disabled = true;
-
-        const bulkData = {
-          contacts: state.contacts.map(c => normalizeContactEmailKey(c)),
-          template: { subject, content },
-          selectedAccount: activeAccount.id,
-          campaignId: `manual_${Date.now()}`
-        };
-
-        log(`🚀 Manual campaign starting...`, 'info');
-        const result = await emailAPI.sendBulkEmails(bulkData);
-
-        if (result.success) {
-          state.stats.totalSent = result.results.sent;
-          state.stats.failed = result.results.failed;
-          state.stats.successRate = result.results.successRate;
-          state.stats.inQueue = 0;
-          updateStats();
-          document.getElementById('progressFill').style.width = '100%';
-          log(`✅ Manual done: ${result.results.sent} sent, ${result.results.failed} failed`, 'success');
-        }
-      } catch (e) {
-        log(`❌ Manual failed: ${e.message}`, 'error');
-      } finally {
-        document.getElementById('startCampaign').disabled = false;
-      }
-    }
-
-    async function startAutoCampaign() {
-
-      if (!Array.isArray(state.contacts) || state.contacts.length === 0) {
-        log('Upload CSV first', 'error');
+    async function startAutoCampaign(groupId) {
+      const groupState = state.groups[groupId];
+      if (!Array.isArray(groupState.contacts) || groupState.contacts.length === 0) {
+        log(`Upload CSV first (${groupId})`, "error");
         return;
       }
 
-      const brandRaw = document.getElementById('brandName')?.value || '';
-      const subjectRaw = document.getElementById('subjectLine')?.value || '';
-      const contentRaw = document.getElementById('emailContent')?.value || '';
+      const brandRaw = groupEl("brandName", groupId)?.value || "";
+      const subjectRaw = groupEl("subjectLine", groupId)?.value || "";
+      const contentRaw = groupEl("emailContent", groupId)?.value || "";
 
-      const brands = brandRaw.split('\n').map(v => v.trim()).filter(Boolean);
-      const subjects = subjectRaw.split('\n').map(v => v.trim()).filter(Boolean);
-      const bodies = contentRaw.split('---').map(v => v.trim()).filter(Boolean);
+      const brands = brandRaw.split("
+").map((v) => v.trim()).filter(Boolean);
+      const subjects = subjectRaw.split("
+").map((v) => v.trim()).filter(Boolean);
+      const bodies = contentRaw.split("---").map((v) => v.trim()).filter(Boolean);
 
       if (!brands.length || !subjects.length || !bodies.length) {
-        log('Brand, subject, and body are required', 'error');
+        log(`Brand, subject, and body are required (${groupId})`, "error");
         return;
       }
 
-      const contacts = state.contacts.map(c => normalizeContactEmailKey(c));
-
       const payload = {
-        contacts,
+        group: groupId,
+        contacts: groupState.contacts.map((c) => normalizeContactEmailKey(c)),
         brandName: brands,
-        template: {
-          subject: subjects,
-          content: bodies
-        }
+        template: { subject: subjects, content: bodies }
       };
-
-      console.log("AUTO CAMPAIGN PAYLOAD:", payload);
 
       try {
         const r = await emailAPI.autoStart(payload);
-        log(`Auto campaign started: ${r.campaignId}`, 'success');
-        await refreshAutoStatus();
+        log(`Auto campaign started (${groupId}): ${r.campaignId}`, "success");
+        await refreshAutoStatus(groupId);
       } catch (e) {
-        log(`Auto start failed: ${e.message}`, 'error');
+        log(`Auto start failed (${groupId}): ${e.message}`, "error");
       }
     }
 
-
-    async function stopAutoCampaign() {
+    async function stopAutoCampaign(groupId) {
       try {
-        await emailAPI.autoStop();
-        log(`🛑 Auto campaign stopped (saved)`, 'warning');
-        await refreshAutoStatus();
+        await emailAPI.autoStop(groupId);
+        log(`Auto campaign stopped (${groupId})`, "warning");
+        await refreshAutoStatus(groupId);
       } catch (e) {
-        log(`Auto stop failed: ${e.message}`, 'error');
+        log(`Auto stop failed (${groupId}): ${e.message}`, "error");
       }
     }
 
-    async function refreshAutoStatus() {
-      const box = document.getElementById('autoStatusBox');
-      const liveBox = document.getElementById('autoLiveBox');
-      const statsBody = document.getElementById('autoStatsBody');
-      const totalsMini = document.getElementById('autoTotalsMini');
-      const eventsLog = document.getElementById('autoEventsLog');
+    async function refreshAutoStatus(groupId) {
+      const box = groupEl("autoStatusBox", groupId);
+      const liveBox = groupEl("autoLiveBox", groupId);
+      const statsBody = groupEl("autoStatsBody", groupId);
+      const totalsMini = groupEl("autoTotalsMini", groupId);
+      const eventsLog = groupEl("autoEventsLog", groupId);
+      if (!box || !liveBox || !statsBody || !totalsMini || !eventsLog) return;
 
       try {
-        const s = await emailAPI.autoStatus();
+        const s = await emailAPI.autoStatus(groupId);
 
-        // No campaign at all
         if (!s.campaign) {
-          box.innerHTML = `Auto Status: <strong>None</strong><br><span style="color:#666;">Start auto campaign to enable hourly sending.</span>`;
-          liveBox.textContent = "—";
-          statsBody.innerHTML = `<tr><td colspan="5" class="mini">No data</td></tr>`;
-          totalsMini.textContent = "—";
-          eventsLog.innerHTML = `<div class="log-entry log-info">No events yet</div>`;
-          // keep header stats from local csv
-          updateStatsFromLocalCsvOnly();
+          box.innerHTML = 'Auto Status: <strong>None</strong>';
+          liveBox.textContent = "-";
+          statsBody.innerHTML = '<tr><td colspan="5" class="mini">No data</td></tr>';
+          totalsMini.textContent = "-";
+          eventsLog.innerHTML = '<div class="log-entry log-info">No events yet</div>';
+          updateStatsFromLocalCsvOnly(groupId);
           return;
         }
 
@@ -1365,300 +1357,160 @@
         const cursor = Number(c.cursor || 0);
         const percent = Number(c.percent || (total ? Math.round((cursor / total) * 100) : 0));
 
-        // Running / Completed should show
-        const statusPill = (c.status === "running")
-          ? `<span class="pill pill-green">RUNNING</span>`
-          : (c.status === "completed")
-            ? `<span class="pill pill-blue">COMPLETED</span>`
-            : `<span class="pill pill-gray">${escapeHtml(String(c.status || ""))}</span>`;
+        box.innerHTML = `Auto Status: <strong>${escapeHtml(c.status || "")}</strong><br>Campaign: <strong>${escapeHtml(c.id)}</strong><br>Progress: <strong>${cursor}/${total}</strong> (${percent}%)`;
 
-        box.innerHTML = `
-        Auto Status: ${statusPill}<br>
-        Campaign: <strong>${escapeHtml(c.id)}</strong><br>
-        Progress: <strong>${cursor}/${total}</strong> (${percent}%)<br>
-        Updated: ${new Date(c.updatedAt).toLocaleString()}
-      `;
+        const progressEl = groupEl("progressFill", groupId);
+        if (progressEl) progressEl.style.width = `${Math.min(100, Math.max(0, percent))}%`;
 
-        const progressEl = document.getElementById('progressFill');
-        if (progressEl) {
-          progressEl.style.width = `${Math.min(100, Math.max(0, percent))}%`;
-        }
-
-
-        // LIVE sender
         const live = s.live || null;
         if (live && live.state === "sending" && live.currentEmail) {
-          liveBox.innerHTML = `
-          <div><span class="pill pill-green">SENDING NOW</span></div>
-          <div style="margin-top:8px"><strong>${escapeHtml(live.currentEmail)}</strong></div>
-          <div class="mini">Sender: ${escapeHtml(live.currentSenderName || "")}</div>
-          <div class="mini">Updated: ${new Date(live.updatedAt).toLocaleString()}</div>
-        `;
-        } else if (live && live.state === "completed") {
-          liveBox.innerHTML = `<span class="pill pill-blue">COMPLETED</span>`;
-        } else if (live && live.state) {
-          liveBox.innerHTML = `<span class="pill pill-gray">${escapeHtml(live.state)}</span>`;
+          liveBox.innerHTML = `<strong>${escapeHtml(live.currentEmail)}</strong><div class="mini">Sender: ${escapeHtml(live.currentSenderName || "")}</div>`;
         } else {
-          liveBox.textContent = "—";
+          liveBox.textContent = live?.state || "-";
         }
 
-        // STATS
-        const stats = s.stats || null;
-        let totalSent = 0, totalFailed = 0;
-        let byAccountRows = [];
+        const stats = s.stats || {};
+        const totalSent = Number(stats.totalSent || 0);
+        const totalFailed = Number(stats.totalFailed || 0);
+        const by = stats.byAccount || {};
+        const rows = Object.keys(by)
+          .map((id) => ({ id, ...by[id] }))
+          .sort((a, b) => Number(b.sent || 0) - Number(a.sent || 0));
 
-        if (stats) {
-          totalSent = Number(stats.totalSent || 0);
-          totalFailed = Number(stats.totalFailed || 0);
-
-          const by = stats.byAccount || {};
-          byAccountRows = Object.keys(by).map(id => {
-            const r = by[id] || {};
-            return {
-              id,
-              email: r.email || '',
-              senderName: r.senderName || '',
-              sent: Number(r.sent || 0),
-              failed: Number(r.failed || 0),
-              lastSentAt: Number(r.lastSentAt || 0)
-            };
-          }).sort((a, b) => b.sent - a.sent);
-        }
-
-        // render per-account
-        if (byAccountRows.length === 0) {
-          statsBody.innerHTML = `<tr><td colspan="5" class="mini">No data</td></tr>`;
+        if (!rows.length) {
+          statsBody.innerHTML = '<tr><td colspan="5" class="mini">No data</td></tr>';
         } else {
-          statsBody.innerHTML = byAccountRows.map(r => `
-          <tr>
-            <td>${escapeHtml(r.email)} <span class="mini">(id ${escapeHtml(r.id)})</span></td>
-            <td>${escapeHtml(r.senderName)}</td>
-            <td><strong>${r.sent}</strong></td>
-            <td>${r.failed}</td>
-            <td>${r.lastSentAt ? new Date(r.lastSentAt).toLocaleString() : '—'}</td>
-          </tr>
-        `).join("");
+          statsBody.innerHTML = rows
+            .map((r) => `<tr><td>${escapeHtml(r.email || "")}</td><td>${escapeHtml(r.senderName || "")}</td><td><strong>${Number(r.sent || 0)}</strong></td><td>${Number(r.failed || 0)}</td><td>${r.lastSentAt ? new Date(r.lastSentAt).toLocaleString() : "-"}</td></tr>`)
+            .join("");
         }
 
         totalsMini.textContent = `Total Sent: ${totalSent} | Total Failed: ${totalFailed} | CSV Total: ${total} | Remaining: ${Math.max(0, total - cursor)}`;
 
-        // EVENTS (latest 80)
         const events = Array.isArray(s.events) ? s.events.slice(-80) : [];
-        if (events.length === 0) {
-          eventsLog.innerHTML = `<div class="log-entry log-info">No events yet</div>`;
+        if (!events.length) {
+          eventsLog.innerHTML = '<div class="log-entry log-info">No events yet</div>';
         } else {
-          eventsLog.innerHTML = events.map(ev => {
-            const ts = ev.ts ? new Date(ev.ts).toLocaleString() : '';
-            if (ev.status === "sent") {
-              return `<div class="log-entry log-success">[${escapeHtml(ts)}] ✅ SENT | from ${escapeHtml(ev.from || "")} → ${escapeHtml(ev.to || "")}</div>`;
-            }
-            if (ev.status === "failed") {
-              return `<div class="log-entry log-error">[${escapeHtml(ts)}] ❌ FAILED | from ${escapeHtml(ev.from || "")} → ${escapeHtml(ev.to || "")} | ${escapeHtml(ev.error || "")}</div>`;
-            }
-            if (ev.status === "campaign_completed") {
-              return `<div class="log-entry log-info">[${escapeHtml(ts)}] 🏁 CAMPAIGN COMPLETED (${escapeHtml(ev.campaignId || "")})</div>`;
-            }
-            return `<div class="log-entry log-info">[${escapeHtml(ts)}] ${escapeHtml(JSON.stringify(ev))}</div>`;
-          }).join("");
+          eventsLog.innerHTML = events
+            .map((ev) => {
+              const ts = ev.ts ? new Date(ev.ts).toLocaleString() : "";
+              if (ev.status === "sent") {
+                const acceptedCount = Array.isArray(ev.accepted) ? ev.accepted.length : 0;
+                const rejectedCount = Array.isArray(ev.rejected) ? ev.rejected.length : 0;
+                const responseNote = ev.response ? ` | response: ${escapeHtml(ev.response)}` : "";
+                return `<div class="log-entry log-success">[${escapeHtml(ts)}] SENT | ${escapeHtml(ev.to || "")} | accepted: ${acceptedCount} | rejected: ${rejectedCount}${responseNote}</div>`;
+              }
+              if (ev.status === "failed") {
+                return `<div class="log-entry log-error">[${escapeHtml(ts)}] FAILED | ${escapeHtml(ev.to || "")} | ${escapeHtml(ev.error || "")}</div>`;
+              }
+              return `<div class="log-entry log-info">[${escapeHtml(ts)}] ${escapeHtml(JSON.stringify(ev))}</div>`;
+            })
+            .join("");
           eventsLog.scrollTop = eventsLog.scrollHeight;
         }
 
-        // ✅ Update header stats using auto stats + campaign cursor
-        const inQueue = Math.max(0, total - cursor);
-        const successRate = (totalSent + totalFailed) > 0 ? Math.round((totalSent / (totalSent + totalFailed)) * 100) : 0;
-
-        state.stats.totalSent = totalSent;
-        state.stats.failed = totalFailed;
-        state.stats.inQueue = inQueue;
-        state.stats.successRate = successRate;
-        updateStats();
-
+        state.groups[groupId].stats = {
+          totalSent,
+          failed: totalFailed,
+          inQueue: Math.max(0, total - cursor),
+          successRate: totalSent + totalFailed > 0 ? Math.round((totalSent / (totalSent + totalFailed)) * 100) : 0
+        };
+        updateStats(groupId);
       } catch (e) {
         box.textContent = `Auto Status: error - ${e.message}`;
       }
     }
 
-    function updateStatsFromLocalCsvOnly() {
-      const csvTotal = state.contacts.length || 0;
-      state.stats.totalSent = 0;
-      state.stats.failed = 0;
-      state.stats.inQueue = csvTotal;
-      state.stats.successRate = 0;
-      updateStats();
-      const progressEl = document.getElementById('progressFill');
-      if (progressEl) {
-        progressEl.style.width = '0%';
-      }
-
+    function updateStatsFromLocalCsvOnly(groupId) {
+      const csvTotal = state.groups[groupId].contacts.length || 0;
+      state.groups[groupId].stats = { totalSent: 0, successRate: 0, inQueue: csvTotal, failed: 0 };
+      updateStats(groupId);
+      const progressEl = groupEl("progressFill", groupId);
+      if (progressEl) progressEl.style.width = "0%";
     }
 
-    async function sendTestEmail() {
-      const testEmail = prompt('Enter test email address:');
-      if (!testEmail) return;
-
-      const subject = document.getElementById('subjectLine').value || 'Test Email';
-      const content = document.getElementById('emailContent').value || 'Test body';
-
-      try {
-        log(`📧 Sending test email...`, 'info');
-        const r = await emailAPI.sendEmail({ to: testEmail, subject, content });
-        log(`✅ Test sent. Message ID: ${r.messageId}`, 'success');
-      } catch (e) {
-        log(`❌ Test failed: ${e.message}`, 'error');
-      }
+    function escapeRegExp(s) {
+      return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     }
-
-    function previewEmail() {
-      if (state.contacts.length === 0) return log('Upload contacts to preview', 'error');
-
-      const brandName = document.getElementById('brandName').value.trim();
-      const subject = document.getElementById('subjectLine').value;
-      const content = document.getElementById('emailContent').value;
-
-      const sample = normalizeContactEmailKey(state.contacts[0]);
-      const active = state.emailAccounts.find(a => a.active) || state.emailAccounts[0];
-      const vars = { ...sample, brandName, senderName: active?.senderName || '' };
-
-      const previewSubject = personalizeTemplate(subject, vars);
-      const previewContent = personalizeTemplate(content, vars);
-
-      const w = window.open('', '_blank', 'width=700,height=520');
-      w.document.write(`
-      <!DOCTYPE html><html><head><title>Preview</title>
-      <style>body{font-family:Arial;padding:20px;line-height:1.6}
-        .preview-header{background:#f8f9fa;padding:15px;border-radius:8px;margin-bottom:20px}
-        .preview-subject{font-size:18px;font-weight:bold;margin-bottom:10px}
-        .preview-content{background:white;padding:20px;border:1px solid #ddd;border-radius:8px}
-      </style></head><body>
-        <div class="preview-header">
-          <div class="preview-subject">Subject: ${escapeHtml(previewSubject)}</div>
-          <div>To: ${escapeHtml(sample.email || '')}</div>
-        </div>
-        <div class="preview-content"><div style="white-space:pre-wrap;">${escapeHtml(previewContent)}</div></div>
-      </body></html>
-    `);
-
-      log('👁️ Preview opened', 'info');
-    }
-
-    function personalizeTemplate(template, vars) {
-      if (!template || typeof template !== 'string') return template;
-      let out = template;
-      Object.keys(vars || {}).forEach(k => {
-        const re = new RegExp(`{{\\s*${escapeRegExp(k)}\\s*}}`, 'g');
-        out = out.replace(re, vars[k] || '');
-      });
-      out = out.replace(/{{[^}]*}}/g, '');
-      return out;
-    }
-
-    function escapeRegExp(s) { return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
     function normalizeContactEmailKey(contact) {
       const email = getContactEmail(contact);
       return { ...contact, email };
     }
 
-    function saveTemplate() {
-      const templateName = document.getElementById('templateName').value || 'Untitled Template';
+    function saveTemplate(groupId) {
       const template = {
-        name: templateName,
-        brandName: document.getElementById('brandName').value || '',
-        subject: document.getElementById('subjectLine').value,
-        content: document.getElementById('emailContent').value,
+        group: groupId,
+        brandName: groupEl("brandName", groupId)?.value || "",
+        subject: groupEl("subjectLine", groupId)?.value || "",
+        content: groupEl("emailContent", groupId)?.value || "",
         timestamp: new Date().toISOString()
       };
       try {
-        localStorage.setItem(`template_${Date.now()}`, JSON.stringify(template));
-        log(`💾 Template saved: "${templateName}"`, 'success');
+        localStorage.setItem(`template_${groupId}_${Date.now()}`, JSON.stringify(template));
       } catch (e) {
-        log(`❌ Save failed: ${e.message}`, 'error');
+        log(`Save failed (${groupId}): ${e.message}`, "error");
       }
     }
 
-    function saveTemplateToLocalStorage() {
+    function saveTemplateToLocalStorage(groupId) {
       const data = {
-        brandRaw: document.getElementById('brandName')?.value || '',
-        subjectRaw: document.getElementById('subjectLine')?.value || '',
-        contentRaw: document.getElementById('emailContent')?.value || ''
+        brandRaw: groupEl("brandName", groupId)?.value || "",
+        subjectRaw: groupEl("subjectLine", groupId)?.value || "",
+        contentRaw: groupEl("emailContent", groupId)?.value || ""
       };
-
-      localStorage.setItem(
-        "last_template_state",
-        JSON.stringify(data)
-      );
+      localStorage.setItem(`last_template_state_${groupId}`, JSON.stringify(data));
     }
 
-    function loadSavedTemplateFromLocalStorage() {
-      const raw = localStorage.getItem("last_template_state");
+    function loadSavedTemplateFromLocalStorage(groupId) {
+      const raw = localStorage.getItem(`last_template_state_${groupId}`);
       if (!raw) return;
-
       try {
         const data = JSON.parse(raw);
-
-        if (document.getElementById('brandName'))
-          document.getElementById('brandName').value = data.brandRaw || '';
-
-        if (document.getElementById('subjectLine'))
-          document.getElementById('subjectLine').value = data.subjectRaw || '';
-
-        if (document.getElementById('emailContent'))
-          document.getElementById('emailContent').value = data.contentRaw || '';
+        if (groupEl("brandName", groupId)) groupEl("brandName", groupId).value = data.brandRaw || "";
+        if (groupEl("subjectLine", groupId)) groupEl("subjectLine", groupId).value = data.subjectRaw || "";
+        if (groupEl("emailContent", groupId)) groupEl("emailContent", groupId).value = data.contentRaw || "";
       } catch (e) {
-        console.warn("Failed to restore template state", e);
+        console.warn(`Failed to restore template state (${groupId})`, e);
       }
     }
 
-
-
-    function downloadSampleCSV() {
-      const sampleData = `firstName,lastName,email,company
+    function downloadSampleCSV(groupId) {
+      const sampleData = "firstName,lastName,email,company
 John,Doe,john.doe@example.com,Acme
-Jane,Smith,jane.smith@example.com,Tech`;
-      const blob = new Blob([sampleData], { type: 'text/csv' });
+Jane,Smith,jane.smith@example.com,Tech";
+      const blob = new Blob([sampleData], { type: "text/csv" });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
-      a.download = 'sample_contacts.csv';
+      a.download = `sample_contacts_${groupId}.csv`;
       a.click();
       URL.revokeObjectURL(url);
-      log('📥 Sample CSV downloaded', 'success');
     }
 
-    function updateStats() {
-      document.getElementById('totalSent').textContent = state.stats.totalSent;
-      document.getElementById('successRate').textContent = state.stats.successRate + '%';
-      document.getElementById('inQueue').textContent = state.stats.inQueue;
-      document.getElementById('failedCount').textContent = state.stats.failed;
+    function updateStats(groupId) {
+      const stats = state.groups[groupId].stats;
+      const totalSentEl = groupEl("totalSent", groupId);
+      const successRateEl = groupEl("successRate", groupId);
+      const inQueueEl = groupEl("inQueue", groupId);
+      const failedCountEl = groupEl("failedCount", groupId);
+      if (totalSentEl) totalSentEl.textContent = String(stats.totalSent || 0);
+      if (successRateEl) successRateEl.textContent = `${stats.successRate || 0}%`;
+      if (inQueueEl) inQueueEl.textContent = String(stats.inQueue || 0);
+      if (failedCountEl) failedCountEl.textContent = String(stats.failed || 0);
     }
 
-  function log(message, type = 'info') {
-  const logArea = document.getElementById('logArea');
-
-  // 🔒 SAFETY GUARD (this fixes everything)
-  if (!logArea) {
-    console.warn('[LOG SKIPPED]', message);
-    return;
-  }
-
-  const timestamp = new Date().toLocaleTimeString();
-  const entry = document.createElement('div');
-  entry.className = `log-entry log-${type}`;
-  entry.textContent = `[${timestamp}] ${message}`;
-
-  logArea.appendChild(entry);
-  logArea.scrollTop = logArea.scrollHeight;
-
-  const entries = logArea.querySelectorAll('.log-entry');
-  if (entries.length > 120) entries[0].remove();
-}
-
+    function log(message, type = "info") {
+      const timestamp = new Date().toLocaleTimeString();
+      console[type === "error" ? "error" : "log"](`[${timestamp}] ${message}`);
+    }
 
     function formatFileSize(bytes) {
-      if (bytes === 0) return '0 Bytes';
-      const k = 1024; const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      if (bytes === 0) return "0 Bytes";
+      const k = 1024;
+      const sizes = ["Bytes", "KB", "MB", "GB"];
       const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
     }
 
     function escapeHtml(s) {
@@ -1670,7 +1522,6 @@ Jane,Smith,jane.smith@example.com,Tech`;
         .replaceAll("'", "&#039;");
     }
 
-    // Expose globally
     window.setActiveAccount = setActiveAccount;
     window.toggleConnection = toggleConnection;
   </script>

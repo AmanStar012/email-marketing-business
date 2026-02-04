@@ -1,5 +1,12 @@
 const { cors, redisGet, redisSet, redisDel } = require("./_shared");
 
+function normalizeGroup(raw) {
+  if (raw == null || raw === "") return "vidzy";
+  const g = String(raw || "").trim().toLowerCase();
+  if (g === "vidzy" || g === "grynow") return g;
+  return null;
+}
+
 /**
  * Check if two contact lists are effectively the same
  * (used for safe resume logic)
@@ -30,7 +37,14 @@ module.exports = async function handler(req, res) {
 
   try {
     const now = Date.now();
-    const { contacts, brandName, template } = req.body || {};
+    const { contacts, brandName, template, group } = req.body || {};
+    const groupId = normalizeGroup(group);
+    if (!groupId) {
+      return res.status(400).json({
+        success: false,
+        error: "group must be 'vidzy' or 'grynow'"
+      });
+    }
 
     /* =========================
        Basic validations
@@ -60,7 +74,7 @@ module.exports = async function handler(req, res) {
        Resume last stopped campaign
        (only if same contacts)
        ========================= */
-    const lastId = await redisGet("auto:campaign:last");
+    const lastId = await redisGet(`auto:campaign:last:${groupId}`);
 
     if (lastId) {
       const lastCampaign = await redisGet(`auto:campaign:${lastId}`);
@@ -74,7 +88,7 @@ module.exports = async function handler(req, res) {
         lastCampaign.updatedAt = now;
 
         await redisSet(`auto:campaign:${lastId}`, lastCampaign);
-        await redisSet("auto:campaign:active", lastId);
+        await redisSet(`auto:campaign:active:${groupId}`, lastId);
 
         // Reset retry / cooldown state
         await redisDel(`auto:campaign:${lastId}:lastSendAt`);
@@ -108,7 +122,7 @@ module.exports = async function handler(req, res) {
     /* =========================
        Create NEW campaign
        ========================= */
-    const campaignId = `c_${Date.now()}`;
+    const campaignId = `c_${groupId}_${Date.now()}`;
 
     const campaign = {
       id: campaignId,
@@ -118,13 +132,14 @@ module.exports = async function handler(req, res) {
       template,
       cursor: 0,
       total: contacts.length,
+      group: groupId,
       createdAt: now,
       updatedAt: now
     };
 
     await redisSet(`auto:campaign:${campaignId}`, campaign);
-    await redisSet("auto:campaign:active", campaignId);
-    await redisSet("auto:campaign:last", campaignId);
+    await redisSet(`auto:campaign:active:${groupId}`, campaignId);
+    await redisSet(`auto:campaign:last:${groupId}`, campaignId);
 
     await redisDel(`auto:campaign:${campaignId}:lastSendAt`);
     await redisDel(`auto:campaign:${campaignId}:retry`);
