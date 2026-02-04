@@ -23,18 +23,74 @@
     .group-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      align-items: start
-    }
-
-    .container {
-      max-width: 1400px;
+      gap: 0;
+      align-items: stretch;
+      max-width: 1700px;
       margin: 0 auto;
       background: rgba(255, 255, 255, .95);
       border-radius: 24px;
       box-shadow: 0 30px 60px rgba(0, 0, 0, .1);
       overflow: hidden;
       backdrop-filter: blur(10px)
+    }
+
+    .container {
+      max-width: none;
+      margin: 0;
+      background: transparent;
+      border-radius: 0;
+      box-shadow: none;
+      overflow: hidden;
+      backdrop-filter: none
+    }
+
+    .container[data-group="vidzy"] {
+      border-right: 1px solid rgba(0, 0, 0, .08)
+    }
+
+    .container .header {
+      padding: 20px
+    }
+
+    .container .header h1 {
+      font-size: 1.6em
+    }
+
+    .container .stats-grid {
+      gap: 10px;
+      margin-top: 18px
+    }
+
+    .container .stat-card {
+      padding: 12px;
+      border-radius: 12px
+    }
+
+    .container .stat-number {
+      font-size: 1.6em
+    }
+
+    .container .main-content {
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding: 18px
+    }
+
+    .container .section {
+      padding: 18px;
+      border-radius: 14px
+    }
+
+    .container .upload-zone {
+      padding: 24px
+    }
+
+    .container .section-title {
+      font-size: 1.1em
+    }
+
+    .container .right-column {
+      margin-top: 0
     }
 
     .header {
@@ -670,6 +726,11 @@
     @media (max-width:768px) {
       .group-grid {
         grid-template-columns: 1fr
+      }
+
+      .container[data-group="vidzy"] {
+        border-right: none;
+        border-bottom: 1px solid rgba(0, 0, 0, .08)
       }
 
       .main-content {
