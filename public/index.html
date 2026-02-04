@@ -1476,9 +1476,9 @@
     }
 
     function downloadSampleCSV(groupId) {
-      const sampleData = "firstName,lastName,email,company
+      const sampleData = `firstName,lastName,email,company
 John,Doe,john.doe@example.com,Acme
-Jane,Smith,jane.smith@example.com,Tech";
+Jane,Smith,jane.smith@example.com,Tech`;
       const blob = new Blob([sampleData], { type: "text/csv" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
