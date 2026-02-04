@@ -1294,10 +1294,8 @@
       const subjectRaw = groupEl("subjectLine", groupId)?.value || "";
       const contentRaw = groupEl("emailContent", groupId)?.value || "";
 
-      const brands = brandRaw.split("
-").map((v) => v.trim()).filter(Boolean);
-      const subjects = subjectRaw.split("
-").map((v) => v.trim()).filter(Boolean);
+      const brands = brandRaw.split("\n").map((v) => v.trim()).filter(Boolean);
+      const subjects = subjectRaw.split("\n").map((v) => v.trim()).filter(Boolean);
       const bodies = contentRaw.split("---").map((v) => v.trim()).filter(Boolean);
 
       if (!brands.length || !subjects.length || !bodies.length) {
