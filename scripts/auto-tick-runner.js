@@ -361,6 +361,6 @@ function accountGroup(email) {
     } catch (e) {
       console.error("Failed to release lock:", e?.message || e);
     }
-    process.exitCode = exitCode;
+    process.exit(exitCode);
   }
 })();
