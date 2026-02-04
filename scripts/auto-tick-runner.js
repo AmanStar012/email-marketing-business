@@ -71,11 +71,12 @@ function accountGroup(email) {
 }
 
 (async function runAutoTick() {
+  let exitCode = 0;
   try {
     const lockOk = await redisSetNx("auto:campaign:lock", Date.now(), LOCK_TTL_SECONDS);
     if (!lockOk) {
       console.log("??? Lock active, exiting");
-      process.exit(0);
+      return;
     }
     console.log("???? Auto Tick Runner started");
 
@@ -351,10 +352,15 @@ function accountGroup(email) {
     for (const groupId of ["vidzy", "grynow"]) {
       await processGroup(groupId);
     }
-
-    process.exit(0);
   } catch (err) {
     console.error("???? Auto Tick Runner crashed:", err);
-    process.exit(1);
+    exitCode = 1;
+  } finally {
+    try {
+      await redisDel("auto:campaign:lock");
+    } catch (e) {
+      console.error("Failed to release lock:", e?.message || e);
+    }
+    process.exitCode = exitCode;
   }
 })();
