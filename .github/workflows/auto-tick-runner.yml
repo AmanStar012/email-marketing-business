@@ -42,6 +42,12 @@ jobs:
           PASS_11: ${{ secrets.PASS_11 }}
           PASS_12: ${{ secrets.PASS_12 }}
           PASS_13: ${{ secrets.PASS_13 }}
-
+          PASS_14: ${{ secrets.PASS_14 }}
+          PASS_15: ${{ secrets.PASS_15 }}
+          PASS_16: ${{ secrets.PASS_16 }}
+          PASS_17: ${{ secrets.PASS_17 }}
+          PASS_18: ${{ secrets.PASS_18 }}
+          PASS_19: ${{ secrets.PASS_19 }}
+          PASS_20: ${{ secrets.PASS_20 }}
 
         run: node scripts/auto-tick-runner.js
